@@ -1,1 +1,2 @@
 http\://drools.org/schema/kie-spring=org.kie.spring.namespace.KieSpringNamespaceHandler
+http\://drools.org/schema/kmodule-spring=org.kie.spring.kmodule.namespace.KModuleSpringNamespaceHandler

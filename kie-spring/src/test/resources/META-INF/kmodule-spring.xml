@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:kie="http://drools.org/schema/kmodule-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                          http://drools.org/schema/kmodule-spring http://drools.org/schema/kmodule-spring.xsd">
+
+  <kie:kmodule id="someid">
+      <kie:kbase name="drl_kiesample">
+        <kie:ksession name="ksession1" type="stateless"/>
+        <kie:ksession name="ksession2"/>
+        <kie:ksession name="statelessWithGroupedListeners" type="stateless"/>
+      </kie:kbase>
+
+      <kie:kbase name="drl_kiesample2">
+        <kie:ksession name="ksession3" type="stateless"/>
+        <kie:ksession name="loggerSession" type="stateless"/>
+        <kie:ksession name="statefulSession" type="stateful"/>
+      </kie:kbase>
+
+      <kie:kbase name="drl_persistence">
+        <kie:ksession name="jpaSingleSessionCommandService2"/>
+      </kie:kbase>
+
+      <kie:kbase name="drl_persistence_rb">
+        <kie:ksession name="jpaSingleSessionCommandServiceRollback"/>
+      </kie:kbase>
+
+      <kie:kbase name="drl_timer_flow">
+        <kie:ksession name="knowledgeBase"/>
+      </kie:kbase>
+  </kie:kmodule>
+
+</beans>
