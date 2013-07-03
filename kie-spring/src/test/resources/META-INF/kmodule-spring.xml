@@ -31,4 +31,14 @@
       </kie:kbase>
   </kie:kmodule>
 
+  <bean id="person" class="org.kie.spring.beans.Person">
+    <constructor-arg type="java.lang.String" index="0" value="HAL"/>
+    <property name="happy" value="false"/>
+  </bean>
+
+  <bean id="person2" class="org.kie.spring.beans.Person">
+    <constructor-arg type="java.lang.String" index="0" value="HAL2"/>
+    <property name="happy" value="false"/>
+  </bean>
+
 </beans>
