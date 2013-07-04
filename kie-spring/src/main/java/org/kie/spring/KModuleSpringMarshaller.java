@@ -17,13 +17,6 @@
 package org.kie.spring;
 
 import org.kie.api.builder.model.KieModuleModel;
-import org.kie.spring.kmodule.factorybeans.KModuleFactoryBean;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
@@ -33,8 +26,13 @@ public class KModuleSpringMarshaller {
 
     public static KieModuleModel fromXML(java.io.File kModuleFile){
         System.out.println("**KModuleSpringMarshaller::fromXML(java.io.File kModuleFile)");
-        ApplicationContext context = new ClassPathXmlApplicationContext(kModuleFile.getAbsolutePath());
-        return null;
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(kModuleFile.getAbsolutePath());
+        kieSpringApplicationListener = new KieSpringApplicationListener();
+        context.addApplicationListener(kieSpringApplicationListener);
+        context.setConfigLocation(kModuleFile.getAbsolutePath());
+        context.refresh();
+        context.registerShutdownHook();
+        return kieSpringApplicationListener.getKieModuleModel();
     }
 
     public static KieModuleModel fromXML(java.net.URL kModuleUrl){
@@ -42,13 +40,6 @@ public class KModuleSpringMarshaller {
         FileSystemXmlApplicationContext context = new FileSystemXmlApplicationContext();
         kieSpringApplicationListener = new KieSpringApplicationListener();
         context.addApplicationListener(kieSpringApplicationListener);
-//        context.addBeanFactoryPostProcessor(new BeanFactoryPostProcessor() {
-//            @Override
-//            public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-//                KieModuleModel kModel = beanFactory.getBean(KieModuleModel.class);
-//                System.out.println("*********KModuleSpringMarshaller::postProcessBeanFactory == "+kModel);
-//            }
-//        });
         context.setConfigLocation(kModuleUrl.toExternalForm());
         context.refresh();
         context.registerShutdownHook();

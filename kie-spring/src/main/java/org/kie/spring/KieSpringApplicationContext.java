@@ -24,7 +24,10 @@ import org.kie.api.KieServices;
 import org.kie.api.builder.KieModule;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieBaseModel;
+import org.kie.api.builder.model.KieSessionModel;
 import org.kie.api.runtime.KieContainer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -38,8 +41,9 @@ import java.util.Map;
 
 public class KieSpringApplicationContext extends StaticApplicationContext {
 
+    private static final Logger log               = LoggerFactory.getLogger(KieSpringApplicationContext.class);
+
     protected boolean initialized;
-    private Map<ReleaseId, KieContainer> gavs;
     private ReleaseId releaseId;
     KieObjectsResolver objectsResolver = null;
 
@@ -47,33 +51,12 @@ public class KieSpringApplicationContext extends StaticApplicationContext {
         return initialized;
     }
 
-//    @Override
-//    public Object getBean(String name) throws BeansException {
-//        try {
-//            Object obj = super.getBean(name);
-//            System.out.println("************user asked for "+name+", and we found **********"+obj);
-//            return obj;
-//        } catch ( NoSuchBeanDefinitionException nsbde) {
-//            if ( super.containsBean(KieSpringUtils.KIE_SPRING_ID_PREFIX+name)){
-//                Object modelBean = super.getBean(KieSpringUtils.KIE_SPRING_ID_PREFIX+name);
-//                if (modelBean instanceof KieBaseModel){
-//                    System.out.println("************user asked for "+name+", and we found **********"+modelBean);
-//                    KieBaseModel kieBaseModel = (KieBaseModel)modelBean;
-//                    KieBase kieBase = objectsResolver.resolveKBase(kieBaseModel.getName(), releaseId);
-//                    if (kieBase != null) {
-//                        getBeanFactory().registerSingleton(kieBaseModel.getName(), kieBase);
-//                        return kieBase;
-//                    }
-//                }
-//            }
-//        }
-//        return null;
-//    }
-
     public void initialize(ReleaseId releaseId) {
+        if ( isInitialized() ) {
+            return;
+        }
         this.releaseId = releaseId;
 
-        System.out.println("************KieSpringApplicationContext::start-initialize******");
         StopWatch sw = new StopWatch();
         sw.start();
         objectsResolver = KieObjectsResolver.get();
@@ -81,14 +64,27 @@ public class KieSpringApplicationContext extends StaticApplicationContext {
             Map<String, KieBaseModel> kieBaseModelBeans = ((ApplicationContext)getParentBeanFactory()).getBeansOfType(KieBaseModel.class);
             for ( String beanName : kieBaseModelBeans.keySet() ){
                 if (beanName.startsWith(KieSpringUtils.KIE_SPRING_ID_PREFIX)) {
-                    System.out.println("************inside initialize. Found bean ::"+beanName+"******");
                     Object obj = kieBaseModelBeans.get(beanName);
                     if (obj != null){
                         KieBaseModel kieBaseModel = (KieBaseModel)obj;
                         String kBaseName = kieBaseModel.getName();
                         KieBase kieBase = objectsResolver.resolveKBase(kBaseName, releaseId);
                         if (kieBase != null) {
-                            getBeanFactory().registerSingleton(kieBaseModel.getName(), kieBase);
+                            getBeanFactory().registerSingleton(kBaseName, kieBase);
+                        }
+                    }
+                }
+            }
+            Map<String, KieSessionModel> kieSessionBeans = ((ApplicationContext)getParentBeanFactory()).getBeansOfType(KieSessionModel.class);
+            for ( String beanName : kieSessionBeans.keySet() ){
+                if (beanName.startsWith(KieSpringUtils.KIE_SPRING_ID_PREFIX)) {
+                    Object obj = kieSessionBeans.get(beanName);
+                    if (obj != null){
+                        KieSessionModel kieSessionModel = (KieSessionModel)obj;
+                        String kieSessionModelName = kieSessionModel.getName();
+                        Object kieSession = objectsResolver.resolveKSession(kieSessionModelName, releaseId);
+                        if (kieSession != null) {
+                            getBeanFactory().registerSingleton(kieSessionModelName, kieSession);
                         }
                     }
                 }
@@ -96,7 +92,7 @@ public class KieSpringApplicationContext extends StaticApplicationContext {
         }
         this.initialized = true;
         sw.stop();
-        System.out.println("************KieSpringApplicationContext::initialize-completed. Took "+sw.getLastTaskTimeMillis()+" Millis.******");
+        log.debug("KieSpringApplicationContext::Initialized. Took "+sw.getLastTaskTimeMillis()+" Millis.");
     }
 
     public KieSpringApplicationContext(ApplicationContext parent) throws BeansException {

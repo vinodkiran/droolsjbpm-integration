@@ -48,18 +48,35 @@ public class KieSpringKModuleTest {
 
     @Test
     public void testKBase() throws Exception {
-        assertNotNull(context.getBean("drl_kiesample"));
-        System.out.println("*********************testKBase--"+context.getBeanDefinitionCount());
+        Object object = context.getBean("drl_kiesample");
+        assertNotNull(object);
+        assertTrue(object instanceof KieBase);
     }
 
     @Test
     public void testKBase2() throws Exception {
-        assertNotNull(context.getBean("drl_kiesample"));
-        System.out.println("*********************testKBase2--"+context.getBeanDefinitionCount());
+        Object object = context.getBean("drl_kiesample2");
+        assertNotNull(object);
+        assertTrue(object instanceof KieBase);
+    }
+
+    @Test
+    public void testKieSession() throws Exception {
+        Object object = context.getBean("ksession2");
+        assertNotNull(object);
+        assertTrue(object instanceof KieSession);
+    }
+
+    @Test
+    public void testKieStatelessSession() throws Exception {
+        Object object = context.getBean("ksession1");
+        assertNotNull(object);
+        assertTrue(object instanceof StatelessKieSession);
     }
 
     @AfterClass
     public static void tearDown() {
+
     }
 
 }
