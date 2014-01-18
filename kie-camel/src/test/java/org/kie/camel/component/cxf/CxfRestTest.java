@@ -17,21 +17,15 @@
 package org.kie.camel.component.cxf;
 
 import org.apache.camel.test.junit4.CamelSpringTestSupport;
-import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.junit.Test;
-import org.kie.api.builder.ReleaseId;
-import org.kie.spring.InternalKieSpringUtils;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.io.File;
 
 public class CxfRestTest extends CamelSpringTestSupport {
 
     @Override
     protected AbstractXmlApplicationContext createApplicationContext() {
-        return (AbstractXmlApplicationContext) InternalKieSpringUtils.getSpringContext(new ReleaseIdImpl("kie-camel", "test-spring", "0001"),
-                                                                                       CxfRestTest.class.getResource("/org/kie/camel/component/CxfRsSpring.xml"));
+        return new ClassPathXmlApplicationContext("org/kie/camel/component/CxfRsSpring.xml");
     }
 
     @Test

@@ -16,27 +16,22 @@
 
 package org.kie.camel.component.cxf;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
+import org.apache.camel.test.junit4.CamelSpringTestSupport;
+import org.springframework.context.support.AbstractXmlApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPMessage;
-
-import org.apache.camel.test.junit4.CamelSpringTestSupport;
-import org.drools.compiler.kproject.ReleaseIdImpl;
-import org.junit.Test;
-import org.kie.spring.InternalKieSpringUtils;
-import org.springframework.context.support.AbstractXmlApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 
 public class CxfSoapTestWithLookup extends CamelSpringTestSupport {
 
     @Override
     protected AbstractXmlApplicationContext createApplicationContext() {
-        return (AbstractXmlApplicationContext) InternalKieSpringUtils.getSpringContext(new ReleaseIdImpl("kie-camel", "test-spring", "0001"),
-                                                                                       CxfSoapTestWithLookup.class.getResource("/org/kie/camel/component/CxfSoapSpringWithoutSession.xml"));
+        return new ClassPathXmlApplicationContext("org/kie/camel/component/CxfSoapSpringWithoutSession.xml");
     }
     // This test fails, I make it work with some hacks.
     // Look for //Bad Hack - Need to remote it and fix it in Camel (if it's a camel problem)
