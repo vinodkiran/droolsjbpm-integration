@@ -77,5 +77,5 @@
     </route> 
         
   </camelContext>
-  
+  <bean id="kiePostProcessor" class="org.kie.spring.KModuleBeanFactoryPostProcessor"/>
 </beans>
