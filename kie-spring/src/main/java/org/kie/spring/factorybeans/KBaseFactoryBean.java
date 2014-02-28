@@ -18,7 +18,9 @@
 package org.kie.spring.factorybeans;
 
 import org.kie.api.KieBase;
+import org.kie.api.KieBaseConfiguration;
 import org.kie.api.builder.ReleaseId;
+import org.kie.spring.KieBaseConfig;
 import org.kie.spring.KieObjectsResolver;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -37,6 +39,7 @@ public class KBaseFactoryBean
     private String declarativeAgenda;
     private String scope;
     private String def;
+    private KieBaseConfig configuration;
 
     private KieBase kBase;
     private ReleaseId releaseId;
@@ -134,8 +137,20 @@ public class KBaseFactoryBean
         return true;
     }
 
+    public KieBaseConfig getConfiguration() {
+        return configuration;
+    }
+
+    public void setConfiguration(KieBaseConfig configuration) {
+        this.configuration = configuration;
+    }
+
     public void afterPropertiesSet() throws Exception {
         KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
-        kBase = kieObjectsResolver.resolveKBase(kBaseName, releaseId);
+        KieBaseConfiguration ruleBaseConfiguration = null;
+        if (configuration != null){
+            ruleBaseConfiguration = configuration.getConf();
+        }
+        kBase = kieObjectsResolver.resolveKBase(kBaseName, releaseId, ruleBaseConfiguration);
     }
 }

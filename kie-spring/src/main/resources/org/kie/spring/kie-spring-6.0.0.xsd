@@ -2,9 +2,11 @@
 <xsd:schema xmlns="http://drools.org/schema/kie-spring"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:spring="http://www.springframework.org/schema/beans"
+            xmlns:tool="http://www.springframework.org/schema/tool"
             targetNamespace="http://drools.org/schema/kie-spring"
             elementFormDefault="qualified"
-            attributeFormDefault="unqualified">
+            attributeFormDefault="unqualified" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://www.springframework.org/schema/tool http://www.springframework.org/schema/tool/spring-tool.xsd">
 
   <xsd:import namespace="http://www.springframework.org/schema/beans"
               schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"/>
@@ -31,8 +33,10 @@
       <xsd:attribute name="equalsBehavior" type="insertBehaviorEnum"/>
       <xsd:attribute name="eventProcessingMode" type="eventModeEnum"/>
       <xsd:attribute name="declarativeAgenda" type="declarativeAgendaEnum" />
+      <xsd:attribute name="conf" type="xsd:IDREF"/>
     </xsd:complexType>
   </xsd:element>
+
 
   <xsd:complexType name="ksessionComplexType">
     <xsd:sequence>

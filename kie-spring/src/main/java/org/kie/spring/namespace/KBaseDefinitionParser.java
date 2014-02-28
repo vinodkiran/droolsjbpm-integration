@@ -16,6 +16,7 @@
 package org.kie.spring.namespace;
 
 
+import org.drools.core.util.StringUtils;
 import org.kie.spring.factorybeans.KBaseFactoryBean;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -41,6 +42,7 @@ public class KBaseDefinitionParser extends AbstractBeanDefinitionParser {
     private static final String ATTRIBUTE_DECLARATIVE_AGENDA = "declarativeAgenda";
     private static final String ATTRIBUTE_SCOPE = "scope";
     private static final String ATTRIBUTE_DEFAULT = "default";
+    private static final String ATTRIBUTE_CONF_REF = "conf";
 
     @SuppressWarnings("unchecked")
     @Override
@@ -58,7 +60,10 @@ public class KBaseDefinitionParser extends AbstractBeanDefinitionParser {
         factory.addPropertyValue("declarativeAgenda", element.getAttribute(ATTRIBUTE_DECLARATIVE_AGENDA));
         factory.addPropertyValue("scope", element.getAttribute(ATTRIBUTE_SCOPE));
         factory.addPropertyValue("def", element.getAttribute(ATTRIBUTE_DEFAULT));
-
+        String confRef = element.getAttribute(ATTRIBUTE_CONF_REF);
+        if(!StringUtils.isEmpty(confRef)){
+            factory.addPropertyValue("configuration", new RuntimeBeanReference(element.getAttribute(ATTRIBUTE_CONF_REF)));
+        }
         element.setAttribute("name", id);
         List<Element> ksessionElements = DomUtils.getChildElementsByTagName(element, "ksession");
         if (ksessionElements != null && ksessionElements.size() > 0) {

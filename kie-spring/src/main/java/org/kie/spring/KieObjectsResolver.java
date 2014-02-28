@@ -20,6 +20,7 @@ import org.drools.compiler.kie.builder.impl.KieContainerImpl;
 import org.drools.compiler.kie.builder.impl.KieProject;
 import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.kie.api.KieBase;
+import org.kie.api.KieBaseConfiguration;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieModule;
 import org.kie.api.builder.KieRepository;
@@ -47,12 +48,7 @@ public class KieObjectsResolver {
     }
 
     public KieBase resolveKBase(String id, ReleaseId releaseId) {
-        KieContainer kieContainer = resolveKContainer(releaseId);
-        KieBase kieBase = kieContainer.getKieBase(id);
-        if (kieBase == null) {
-            kieBase = kieContainer.newKieBase(id, null);
-        }
-        return kieBase;
+        return resolveKBase(id, releaseId, null);
     }
 
     public Object resolveKSession(String id, ReleaseId releaseId) {
@@ -119,5 +115,14 @@ public class KieObjectsResolver {
                 return kieBase.newKieSession(conf, null);
             }
         }
+    }
+
+    public KieBase resolveKBase(String kBaseName, ReleaseId releaseId, KieBaseConfiguration kieBaseConfiguration) {
+        KieContainer kieContainer = resolveKContainer(releaseId);
+        KieBase kieBase = kieContainer.getKieBase(kBaseName);
+        if (kieBase == null) {
+            kieBase = kieContainer.newKieBase(kBaseName, kieBaseConfiguration);
+        }
+        return kieBase;
     }
 }
