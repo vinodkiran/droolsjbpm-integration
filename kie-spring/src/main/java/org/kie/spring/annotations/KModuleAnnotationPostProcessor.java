@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 JBoss Inc
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import org.springframework.stereotype.Component;
 
 @Component("kieAnnotationPostProcessor")
 public class KModuleAnnotationPostProcessor extends KModuleBeanFactoryPostProcessor {
-
-    private static final Logger log               = LoggerFactory.getLogger(KModuleAnnotationPostProcessor.class);
 
     public KModuleAnnotationPostProcessor() {
     }

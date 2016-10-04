@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 JBoss Inc
+ * Copyright 2011 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,9 @@ public interface TestableFluent<P> {
     
     <T> P test(T actual, org.hamcrest.Matcher<T> matcher);
     
-    <T> P test(String text);
+    P test(String text);
     
-    <T> P test(ReflectiveMatcherAssert matcher);
+    P test(ReflectiveMatcherAssert matcher);
 
+    CheckableFluent<P> given(String name);
 }

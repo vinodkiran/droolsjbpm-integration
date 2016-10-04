@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 JBoss Inc
+ * Copyright 2013 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,6 +70,8 @@ public class KieBaseElementParser extends AbstractElementParser {
         MutablePassThroughMetadata passThroughMetadata = context.createMetadata(MutablePassThroughMetadata.class);
         passThroughMetadata.setObject(kBaseOptionsAdaptor);
         beanMetadata.addArgument(passThroughMetadata, null, 2);
+
+        addBundleContextProperty(beanMetadata, context);
 
         String prefix = element.getPrefix();
         NodeList ksessionNodeList = element.getElementsByTagName(prefix+":ksession");

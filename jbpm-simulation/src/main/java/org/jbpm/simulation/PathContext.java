@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.jbpm.simulation;
 
 import java.util.LinkedHashSet;
@@ -9,6 +24,8 @@ import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.SequenceFlow;
 
 public class PathContext {
+
+    private final int maxElementsSize = Integer.parseInt(System.getProperty("org.jbpm.simulation.max.elements", "500"));
     
     public enum Type {
         ROOT,
@@ -26,6 +43,8 @@ public class PathContext {
     private String pathId;
 
     private Set<FlowElement> visitedSplitPoint = new LinkedHashSet<FlowElement>();
+
+    private FlowElement splitOrigin = null;
 
     protected int getCanBeFinishedCounter() {
         return canBeFinishedCounter;
@@ -46,6 +65,7 @@ public class PathContext {
     }
     
     public void addPathElement(FlowElement element) {
+        checkSize();
         if (!locked) {
             this.pathElements.add(element);
         }
@@ -58,6 +78,7 @@ public class PathContext {
     }
     
     public void addAllPathElement(List<SequenceFlow> elements) {
+        checkSize();
         if (!locked) {
             this.pathElements.addAll(elements);
         }
@@ -135,5 +156,21 @@ public class PathContext {
     public void setVisitedSplitPoint(Set<FlowElement> visitedSplitPoint) {
         this.visitedSplitPoint = visitedSplitPoint;
     }
+
+
+    protected void checkSize() {
+        if (pathElements.size() > maxElementsSize) {
+            throw new RuntimeException("Unable to calculate path elements of the process - max size (" + maxElementsSize + ") of elements exceeded");
+        }
+    }
+
+    public FlowElement getSplitOrigin() {
+        return splitOrigin;
+    }
+
+    public void setSplitOrigin(FlowElement splitOrigin) {
+        this.splitOrigin = splitOrigin;
+    }
+
 
 }

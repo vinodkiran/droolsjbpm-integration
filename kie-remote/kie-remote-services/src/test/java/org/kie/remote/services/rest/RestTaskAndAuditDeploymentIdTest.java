@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.kie.remote.services.rest;
 
 import static org.kie.remote.services.MockSetupTestHelper.FOR_INDEPENDENT_TASKS;
@@ -20,6 +35,7 @@ import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.task.commands.TaskCommand;
+import org.junit.Before;
 import org.junit.Test;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.remote.services.TaskDeploymentIdTest;
@@ -35,6 +51,8 @@ public class RestTaskAndAuditDeploymentIdTest extends TaskResourceImpl implement
     
     private UriInfo uriInfoMock;
     private HttpServletRequest httpRequestMock;
+    
+    private boolean getTasksTest = false;
 
     @Override
     public void setProcessServiceMock(ProcessService processServiceMock) {
@@ -46,6 +64,16 @@ public class RestTaskAndAuditDeploymentIdTest extends TaskResourceImpl implement
         this.userTaskServiceMock = userTaskServiceMock;
     }
 
+    @Override
+    public boolean getTasksTest() {
+        return this.getTasksTest;
+    }
+   
+    @Before
+    public void before() { 
+        this.getTasksTest = false;
+    }
+    
     public void setupTestMocks() {
         // REST
         uriInfoMock = mock(UriInfo.class);

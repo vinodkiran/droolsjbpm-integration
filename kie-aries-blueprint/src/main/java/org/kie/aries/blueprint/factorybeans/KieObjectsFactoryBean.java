@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 JBoss Inc
+ * Copyright 2013 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,75 +21,66 @@ import org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
 import org.drools.persistence.jpa.KnowledgeStoreServiceImpl;
 import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
 import org.kie.api.KieBase;
-import org.kie.api.KieServices;
+import org.kie.api.builder.KieScanner;
 import org.kie.api.builder.ReleaseId;
-import org.kie.api.event.KieRuntimeEventManager;
 import org.kie.api.marshalling.ObjectMarshallingStrategy;
 import org.kie.api.persistence.jpa.KieStoreServices;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
-import org.kie.api.runtime.KieContainer;
-import org.kie.api.runtime.KieSession;
 import org.kie.aries.blueprint.helpers.JPAPlaceholderResolverStrategyHelper;
-import org.osgi.service.blueprint.container.ComponentDefinitionException;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class KieObjectsFactoryBean {
 
-    public static KieBase fetchKBase(String id, ReleaseId releaseId, KBaseOptions kbaseOptions){
-        KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
-        return kieObjectsResolver.resolveKBase(id, releaseId);
+    static final ImportInjector importInjector = new ImportInjector();
+
+    public static Object fetchKBase(String id, ReleaseId releaseId, KBaseOptions kbaseOptions) {
+        return new KieBaseResolver(releaseId, id);
     }
 
-    public static KieContainer fetchKContainer(ReleaseId releaseId){
-        KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
-        KieServices ks = KieServices.Factory.get();
-        if ( releaseId == null) {
-            return ks.getKieClasspathContainer();
-        }
-        return ks.newKieContainer(releaseId);
+    public static Object fetchKContainer(ReleaseId releaseId){
+        return new KieContainerResolver(releaseId);
     }
 
     public static Object createKieSessionRef(String id, ReleaseId releaseId, List<KieListenerAdaptor> listeners, List<KieLoggerAdaptor> loggers, List<?> commands){
-        KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
-        Object obj = kieObjectsResolver.resolveKSession(id, releaseId);
-        if ( obj != null) {
-            KieSessionFactoryBeanHelper.addListeners((KieRuntimeEventManager) obj, listeners);
-            KieSessionFactoryBeanHelper.attachLoggers((KieRuntimeEventManager) obj, loggers);
-            if (obj instanceof KieSession){
-                KieSessionFactoryBeanHelper.executeCommands((KieSession)obj, commands);
-            }
-            return obj;
-        }
-        throw new ComponentDefinitionException("No KSession found in kmodule.xml with id '"+id+"'.");
+        return new KieSessionRefResolver( releaseId, id, listeners, loggers, commands );
     }
 
     public static Object createKieSession(String id, ReleaseId releaseId, List<KieListenerAdaptor> listeners, List<KieLoggerAdaptor> loggers, List<?> commands, KSessionOptions kSessionOptions){
-        KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
-        Object obj ;
-        if ("stateless".equalsIgnoreCase(kSessionOptions.getType())) {
-            obj = kieObjectsResolver.newStatelessSession(kSessionOptions.getkBaseRef(), releaseId, null);
-        } else {
-            obj = kieObjectsResolver.newStatefulSession(kSessionOptions.getkBaseRef(), releaseId, null);
-            KieSessionFactoryBeanHelper.executeCommands((KieSession)obj, commands);
-        }
-
-        KieSessionFactoryBeanHelper.addListeners((KieRuntimeEventManager) obj, listeners);
-        KieSessionFactoryBeanHelper.attachLoggers((KieRuntimeEventManager) obj, loggers);
-
-        return obj;
+        return new KieSessionResolver( releaseId, listeners, loggers, commands, kSessionOptions );
     }
 
     public static KieStoreServices createKieStore() throws Exception {
-
-        KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
         return new KnowledgeStoreServiceImpl();
     }
 
     public static ReleaseId createReleaseId(String id, String groupId, String artifactId, String version){
         return new ReleaseIdImpl(groupId, artifactId, version);
+    }
+
+    public static Object createImport(String releaseIdName, ReleaseId releaseId, boolean enableScanner, long scannerInterval) {
+        return new KieImportResolver( releaseIdName, releaseId, enableScanner, scannerInterval );
+    }
+
+    public static Object createImportedKieSession( String ksessionName ) {
+        KieImportSessionResolver resolver = new KieImportSessionResolver( ksessionName );
+        importInjector.registerSessionResolver( ksessionName, resolver );
+        return resolver;
+    }
+
+    public static Object createImportedKieBase( String kbaseName ) {
+        KieImportBaseResolver resolver = new KieImportBaseResolver( kbaseName );
+        importInjector.registerBaseResolver( kbaseName, resolver );
+        return resolver;
+    }
+
+    public static Object createImportedKieScanner( String kscannerName ) {
+        KieImportScannerResolver resolver = new KieImportScannerResolver( kscannerName );
+        importInjector.registerScannerResolver( kscannerName, resolver );
+        return resolver;
     }
 
     public static Environment createEnvironment(String id, HashMap<String, Object> parameters, List<Object> marshallingStrategies){
@@ -121,5 +112,44 @@ public class KieObjectsFactoryBean {
 
     public static ClassObjectMarshallingStrategyAcceptor createDefaultAcceptor(){
         return ClassObjectMarshallingStrategyAcceptor.DEFAULT;
+    }
+
+    public static class ImportInjector {
+        private Map<String, KieImportSessionResolver> sessionResolvers = new HashMap<String, KieImportSessionResolver>();
+        private Map<String, KieImportBaseResolver> baseResolvers = new HashMap<String, KieImportBaseResolver>();
+        private Map<String, KieImportScannerResolver> scannerResolvers = new HashMap<String, KieImportScannerResolver>();
+
+        public void registerSessionResolver( String name, KieImportSessionResolver resolver ) {
+            sessionResolvers.put( name, resolver );
+        }
+
+        public void registerBaseResolver( String name, KieImportBaseResolver resolver ) {
+            baseResolvers.put( name, resolver );
+        }
+
+        public void registerScannerResolver( String name, KieImportScannerResolver resolver ) {
+            scannerResolvers.put( name, resolver );
+        }
+
+        public void wireSession(String name, Object kieSession) {
+            KieImportSessionResolver resolver = sessionResolvers.get(name);
+            if (resolver != null) {
+                resolver.setSession( kieSession );
+            }
+        }
+
+        public void wireBase(String name, KieBase kieBase ) {
+            KieImportBaseResolver resolver = baseResolvers.get(name);
+            if (resolver != null) {
+                resolver.setBase( kieBase );
+            }
+        }
+
+        public void wireScanner(String name, KieScanner kieScanner ) {
+            KieImportScannerResolver resolver = scannerResolvers.get(name);
+            if (resolver != null) {
+                resolver.setScanner( kieScanner );
+            }
+        }
     }
 }

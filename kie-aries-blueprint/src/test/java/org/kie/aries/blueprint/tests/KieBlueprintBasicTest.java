@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 JBoss Inc
+ * Copyright 2013 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,6 @@
  */
 package org.kie.aries.blueprint.tests;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.aries.blueprint.container.BlueprintContainerImpl;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -32,13 +28,14 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.StatelessKieSession;
 import org.kie.aries.blueprint.KieBlueprintContainer;
 import org.kie.aries.blueprint.beans.Person;
-import org.kie.aries.blueprint.factorybeans.KieObjectsResolver;
-import org.osgi.service.blueprint.container.ComponentDefinitionException;
 import org.osgi.service.blueprint.container.NoSuchComponentException;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
-@Ignore("Add when org.apache.aries.blueprint.noosgi 1.0.1 is released")
 public class KieBlueprintBasicTest {
 
     static BlueprintContainerImpl container = null;

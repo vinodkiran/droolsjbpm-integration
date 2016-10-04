@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 JBoss Inc
+ * Copyright 2013 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,6 +101,8 @@ public class KieSessionElementParser extends AbstractElementParser {
             beanMetadata.setFactoryMethod("createKieSessionRef");
         }
 
+        addBundleContextProperty(beanMetadata, context);
+
         kSessionOptions.setDef(element.getAttribute(ATTRIBUTE_DEFAULT));
         kSessionOptions.setClockType(element.getAttribute(ATTRIBUTE_SCOPE));
         kSessionOptions.setScope(element.getAttribute(ATTRIBUTE_CLOCK_TYPE));
@@ -112,7 +114,6 @@ public class KieSessionElementParser extends AbstractElementParser {
 
         return beanMetadata;
     }
-
 
     protected Metadata checkForChildListeners(ParserContext context, Element element){
         NodeList nodeList = element.getChildNodes();

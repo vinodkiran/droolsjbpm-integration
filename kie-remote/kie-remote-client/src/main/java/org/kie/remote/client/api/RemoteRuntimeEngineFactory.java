@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.kie.remote.client.api;
 
 import java.util.Properties;
@@ -28,7 +43,7 @@ public abstract class RemoteRuntimeEngineFactory {
      * @return A {@link RemoteJmsRuntimeEngineBuilder} instance
      */
     public static RemoteJmsRuntimeEngineBuilder newJmsBuilder() { 
-       return org.kie.services.client.api.RemoteRuntimeEngineFactory.newJmsBuilder();
+       return org.kie.remote.client.internal.RemoteRuntimeEngineFactory.newJmsBuilder();
     }
     
     /**
@@ -37,7 +52,7 @@ public abstract class RemoteRuntimeEngineFactory {
      * @return A {@link RemoteRestRuntimeEngineBuilder} instance
      */
     public static RemoteRestRuntimeEngineBuilder newRestBuilder() { 
-       return org.kie.services.client.api.RemoteRuntimeEngineFactory.newRestBuilder();
+       return org.kie.remote.client.internal.RemoteRuntimeEngineFactory.newRestBuilder();
     }
     
     /**
@@ -46,14 +61,14 @@ public abstract class RemoteRuntimeEngineFactory {
      * @return A {@link RemoteWebserviceClientBuilder} instance
      */
     public static RemoteWebserviceClientBuilder<RemoteWebserviceClientBuilder, CommandWebService> newCommandWebServiceClientBuilder() { 
-       return org.kie.services.client.api.RemoteRuntimeEngineFactory.newCommandWebServiceClientBuilder();
+       return org.kie.remote.client.internal.RemoteRuntimeEngineFactory.newCommandWebServiceClientBuilder();
     }
     
     /**
      * @return a new (remote client) {@link RuntimeEngine} instance.
      * @see {@link RemoteRuntimeEngineBuilder#buildRuntimeEngine()}
      */
-    abstract public RuntimeEngine newRuntimeEngine();
+     public abstract RuntimeEngine newRuntimeEngine();
     
     /**
      * Retrieves the (remote) {@link InitialContext} from the JBoss AS server instance in order 

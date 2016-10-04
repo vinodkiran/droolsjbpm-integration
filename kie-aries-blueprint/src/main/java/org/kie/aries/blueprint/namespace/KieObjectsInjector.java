@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 JBoss Inc
+ * Copyright 2013 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,10 @@
 package org.kie.aries.blueprint.namespace;
 
 import org.apache.aries.blueprint.BeanProcessor;
-import org.apache.aries.blueprint.ExtendedBeanMetadata;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.PassThroughMetadata;
 import org.apache.aries.blueprint.mutable.MutableBeanArgument;
 import org.apache.aries.blueprint.mutable.MutablePassThroughMetadata;
-import org.apache.aries.blueprint.mutable.MutableValueMetadata;
 import org.drools.compiler.kie.builder.impl.ClasspathKieProject;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
@@ -39,6 +37,7 @@ import org.kie.api.conf.DeclarativeAgendaOption;
 import org.kie.api.conf.EqualityBehaviorOption;
 import org.kie.api.conf.EventProcessingOption;
 import org.kie.api.runtime.conf.ClockTypeOption;
+import org.kie.aries.blueprint.factorybeans.Initializable;
 import org.kie.aries.blueprint.factorybeans.KBaseOptions;
 import org.kie.aries.blueprint.factorybeans.KSessionOptions;
 import org.kie.aries.blueprint.factorybeans.KieObjectsFactoryBean;
@@ -48,6 +47,7 @@ import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.reflect.BeanArgument;
 import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
+import org.osgi.service.blueprint.reflect.ValueMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +67,7 @@ public class KieObjectsInjector implements BeanProcessor {
     private ReleaseId releaseId;
     private URL configFileURL;
     private ParserContext parserContext;
+    private BlueprintContextHelper context;
 
     /** The list of Aries Blueprint XML files*/
     protected java.util.List<java.net.URL> resources;
@@ -89,18 +90,16 @@ public class KieObjectsInjector implements BeanProcessor {
         this.contextId = contextId;
     }
 
-    public KieObjectsInjector() {
-
-    }
-
+    public KieObjectsInjector() { }
 
     public void setBlueprintContainer(BlueprintContainer blueprintContainer) {
         this.blueprintContainer = blueprintContainer;
+        this.context = new BlueprintContextHelper( blueprintContainer );
     }
 
-    public void afterPropertiesSet(){
+    public void afterKmoduleSet() {
         log.debug(" :: Starting Blueprint KieObjectsInjector for kmodule ("+contextId+") :: ");
-        if ( resources == null || resources.size() == 0) {
+        if ( resources == null || resources.isEmpty()) {
             configFileURL = getClass().getResource("/");
             if (configFileURL == null) {
                 createOsgiKieModule();
@@ -129,6 +128,10 @@ public class KieObjectsInjector implements BeanProcessor {
         if ( componentMetadata instanceof MutablePassThroughMetadata){
             ((MutablePassThroughMetadata)componentMetadata).setObject(kieModuleModel);
         }
+    }
+
+    public void afterImportSet() {
+        // no-op
     }
 
     private void createOsgiKieModule() {
@@ -177,12 +180,12 @@ public class KieObjectsInjector implements BeanProcessor {
 
     protected void addKieModuleToRepo(KieModuleModel kieModuleModel) {
         String rootPath = configFilePath;
-        if ( rootPath.lastIndexOf( ':' ) > 0 ) {
+        if ( rootPath.lastIndexOf( ':' ) >= 2 ) { // avoid to trucate Windows paths like C:\my\folder\...
             rootPath = configFilePath.substring( rootPath.lastIndexOf( ':' ) + 1 );
         }
 
         KieBuilderImpl.setDefaultsforEmptyKieModule(kieModuleModel);
-        InternalKieModule internalKieModule = ClasspathKieProject.createInternalKieModule(configFileURL, configFilePath, kieModuleModel, releaseId, rootPath);
+        InternalKieModule internalKieModule = ClasspathKieProject.createInternalKieModule(kieModuleModel, releaseId, rootPath);
         if ( internalKieModule != null ) {
             KieServices ks = KieServices.Factory.get();
             ks.getRepository().addKieModule(internalKieModule);
@@ -201,7 +204,7 @@ public class KieObjectsInjector implements BeanProcessor {
                 if (KieObjectsFactoryBean.class.getName().equals(metadata.getClassName())) {
                     if ("fetchKBase".equalsIgnoreCase(metadata.getFactoryMethod())) {
                         BeanArgument kbRefArg = metadata.getArguments().get(0);
-                        String kBaseName = ((MutableValueMetadata) kbRefArg.getValue()).getStringValue();
+                        String kBaseName = ((ValueMetadata) kbRefArg.getValue()).getStringValue();
                         KieBaseModelImpl kBase = new KieBaseModelImpl();
                         kBase.setKModule(kieModuleModel);
                         kBase.setName(kBaseName);
@@ -261,7 +264,7 @@ public class KieObjectsInjector implements BeanProcessor {
                 if (KieObjectsFactoryBean.class.getName().equals(metadata.getClassName())) {
                     if ("createKieSession".equalsIgnoreCase(metadata.getFactoryMethod())){
                         BeanArgument beanArgument = metadata.getArguments().get(0);
-                        String ksessionName = ((MutableValueMetadata)beanArgument.getValue()).getStringValue();
+                        String ksessionName = ((ValueMetadata)beanArgument.getValue()).getStringValue();
 
                         BeanArgument kbOptionsArg = metadata.getArguments().get(5);
                         PassThroughMetadata passThroughMetadata = (PassThroughMetadata) kbOptionsArg.getValue();
@@ -302,7 +305,11 @@ public class KieObjectsInjector implements BeanProcessor {
 
     @Override
     public Object afterInit(Object o, String s, BeanCreator beanCreator, BeanMetadata beanMetadata) {
-        return o;
+        try {
+            return o instanceof Initializable ? ( (Initializable) o ).init( context ) : o;
+        } catch (Exception e) {
+            throw new RuntimeException( e );
+        }
     }
 
     @Override

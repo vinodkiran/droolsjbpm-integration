@@ -1,6 +1,21 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.jbpm.simulation.impl.events;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jbpm.simulation.AggregatedSimulationEvent;
 
 public class AggregatedEndEventSimulationEvent implements
@@ -17,15 +32,15 @@ public class AggregatedEndEventSimulationEvent implements
     
     protected long numberOfInstances; 
     
-    public AggregatedEndEventSimulationEvent(String activityName, String activityId, double minProcessDuration,
-            double avgProcessDuration, double maxProcessDuration, long numberOfInstances, String type) {
+    public AggregatedEndEventSimulationEvent(String activityName, String activityId, Number minProcessDuration,
+            Number avgProcessDuration, Number maxProcessDuration, Number numberOfInstances, String type) {
         super();        
         this.activityName = activityName;
         this.activityId = activityId;
-        this.minProcessDuration = minProcessDuration;
-        this.avgProcessDuration = avgProcessDuration;
-        this.maxProcessDuration = maxProcessDuration;
-        this.numberOfInstances = numberOfInstances;
+        this.minProcessDuration = minProcessDuration.doubleValue();
+        this.avgProcessDuration = avgProcessDuration.doubleValue();
+        this.maxProcessDuration = maxProcessDuration.doubleValue();
+        this.numberOfInstances = numberOfInstances.longValue();
         this.type = type;
     }
 

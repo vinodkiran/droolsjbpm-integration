@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.kie.remote.services;
 
 import java.util.Collections;
@@ -34,18 +49,25 @@ import org.jbpm.process.audit.command.FindSubProcessInstancesCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesByNameCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.jbpm.services.task.commands.ActivateTaskCommand;
+import org.jbpm.services.task.commands.AddCommentCommand;
+import org.jbpm.services.task.commands.AddContentFromUserCommand;
 import org.jbpm.services.task.commands.AddTaskCommand;
 import org.jbpm.services.task.commands.CancelDeadlineCommand;
 import org.jbpm.services.task.commands.ClaimNextAvailableTaskCommand;
 import org.jbpm.services.task.commands.ClaimTaskCommand;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.DelegateTaskCommand;
+import org.jbpm.services.task.commands.DeleteCommentCommand;
 import org.jbpm.services.task.commands.ExecuteTaskRulesCommand;
 import org.jbpm.services.task.commands.ExitTaskCommand;
 import org.jbpm.services.task.commands.FailTaskCommand;
 import org.jbpm.services.task.commands.ForwardTaskCommand;
+import org.jbpm.services.task.commands.GetAllCommentsCommand;
 import org.jbpm.services.task.commands.GetAttachmentCommand;
-import org.jbpm.services.task.commands.GetContentCommand;
+import org.jbpm.services.task.commands.GetCommentCommand;
+import org.jbpm.services.task.commands.GetContentByIdCommand;
+import org.jbpm.services.task.commands.GetContentByIdForUserCommand;
+import org.jbpm.services.task.commands.GetContentMapForUserCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
 import org.jbpm.services.task.commands.GetTaskByWorkItemIdCommand;
@@ -59,10 +81,12 @@ import org.jbpm.services.task.commands.NominateTaskCommand;
 import org.jbpm.services.task.commands.ProcessSubTaskCommand;
 import org.jbpm.services.task.commands.ReleaseTaskCommand;
 import org.jbpm.services.task.commands.ResumeTaskCommand;
+import org.jbpm.services.task.commands.SetTaskPropertyCommand;
 import org.jbpm.services.task.commands.SkipTaskCommand;
 import org.jbpm.services.task.commands.StartTaskCommand;
 import org.jbpm.services.task.commands.StopTaskCommand;
 import org.jbpm.services.task.commands.SuspendTaskCommand;
+import org.jbpm.services.task.commands.TaskSummaryQueryCommand;
 import org.kie.api.command.Command;
 
 @SuppressWarnings("rawtypes")
@@ -112,9 +136,19 @@ public class AcceptedServerCommands {
         acceptedCommands.add(ForwardTaskCommand.class);
         acceptedCommands.add(GetAttachmentCommand.class);
 
-        acceptedCommands.add(GetContentCommand.class);
+        acceptedCommands.add(GetContentByIdCommand.class);
         acceptedCommands.add(GetTaskContentCommand.class);
 
+        acceptedCommands.add(DeleteCommentCommand.class);
+        acceptedCommands.add(AddCommentCommand.class);
+        acceptedCommands.add(GetAllCommentsCommand.class);
+        acceptedCommands.add(GetCommentCommand.class);
+        acceptedCommands.add(SetTaskPropertyCommand.class);
+       
+        acceptedCommands.add(AddContentFromUserCommand.class);
+        acceptedCommands.add(GetContentByIdForUserCommand.class);
+        acceptedCommands.add(GetContentMapForUserCommand.class);
+        
         acceptedCommands.add(GetTaskAssignedAsBusinessAdminCommand.class);
         acceptedCommands.add(GetTaskAssignedAsPotentialOwnerCommand.class);
         acceptedCommands.add(GetTaskByWorkItemIdCommand.class);
@@ -124,6 +158,7 @@ public class AcceptedServerCommands {
         acceptedCommands.add(GetTasksByStatusByProcessInstanceIdCommand.class);
         acceptedCommands.add(GetTasksByVariousFieldsCommand.class);
         acceptedCommands.add(GetTasksOwnedCommand.class);
+        acceptedCommands.add(TaskSummaryQueryCommand.class);
         acceptedCommands.add(NominateTaskCommand.class);
         acceptedCommands.add(ReleaseTaskCommand.class);
         acceptedCommands.add(ResumeTaskCommand.class);

@@ -1,27 +1,42 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.jbpm.simulation.impl.events;
 
 public class HTAggregatedSimulationEvent extends AggregatedActivitySimulationEvent {
 
     public HTAggregatedSimulationEvent(String activityName, String activityId,
-            double minExecutionTime, double avgExecutionTime,
-            double maxExecutionTime, double minWaitTime, double avgWaitTime,
-            double maxWaitTime, double minResourceUtilization, double avgResourceUtilization, 
-            double maxResourceUtilization, long numberOfInstances, double avgResourceCost,
-            double minResourceCost, double maxResourceCost, String type) {
+            Number minExecutionTime, Number avgExecutionTime,
+            Number maxExecutionTime, Number minWaitTime, Number avgWaitTime,
+            Number maxWaitTime, Number minResourceUtilization, Number avgResourceUtilization,
+            Number maxResourceUtilization, Number numberOfInstances, Number avgResourceCost,
+            Number minResourceCost, Number maxResourceCost, String type) {
         
         super(activityName, activityId, minExecutionTime, avgExecutionTime,
                 maxExecutionTime, numberOfInstances, type);
-        this.minWaitTime = minWaitTime;
-        this.avgWaitTime = avgWaitTime;
-        this.maxWaitTime = maxWaitTime;
+        this.minWaitTime = minWaitTime.doubleValue();
+        this.avgWaitTime = avgWaitTime.doubleValue();
+        this.maxWaitTime = maxWaitTime.doubleValue();
         
-        this.minResourceUtilization = minResourceUtilization;
-        this.avgResourceUtilization = avgResourceUtilization;
-        this.maxResourceUtilization = maxResourceUtilization;
+        this.minResourceUtilization = minResourceUtilization.doubleValue();
+        this.avgResourceUtilization = avgResourceUtilization.doubleValue();
+        this.maxResourceUtilization = maxResourceUtilization.doubleValue();
         
-        this.minResourceCost = minResourceCost;
-        this.avgResourceCost = avgResourceCost;
-        this.maxResourceCost = maxResourceCost;
+        this.minResourceCost = minResourceCost.doubleValue();
+        this.avgResourceCost = avgResourceCost.doubleValue();
+        this.maxResourceCost = maxResourceCost.doubleValue();
     }
 
 

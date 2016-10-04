@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.jbpm.simulation.impl.ht;
 
 import static org.junit.Assert.assertEquals;
@@ -7,15 +22,17 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.time.DurationFormatUtils;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.jbpm.simulation.SimulationContextFactory;
 import org.jbpm.simulation.SimulationDataProvider;
 import org.jbpm.simulation.impl.SimulationPath;
 import org.jbpm.simulation.util.SimulationConstants;
 import org.jbpm.workflow.core.node.HumanTaskNode;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.definition.process.Node;
 
+@Ignore("Ignoring as this refers to unfinished work and requires to be revisited - JBPM-4871")
 public class StaffPoolImplTest {
 
     @Test

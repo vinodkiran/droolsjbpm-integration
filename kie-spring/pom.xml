@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>6.3.0-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.kie</groupId>
@@ -16,6 +16,10 @@
 
   <name>Kie :: Spring</name>
   <description>Drools and jBPM integration for Spring.</description>
+
+  <properties>
+    <osgi.Bundle-SymbolicName>org.kie.spring</osgi.Bundle-SymbolicName>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -213,6 +217,12 @@
       <artifactId>jbpm-audit</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -234,7 +244,6 @@
         <configuration>
           <instructions>
             <_removeheaders>Ignore-Package</_removeheaders>
-            <Bundle-SymbolicName>org.kie.spring</Bundle-SymbolicName>
             <Bundle-Name>Kie Spring</Bundle-Name>
             <Import-Package>
               !org.kie.spring*,

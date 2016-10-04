@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 JBoss Inc
+ * Copyright 2010 Red Hat, Inc. and/or its affiliates
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -115,7 +115,8 @@ public class JaxbTaskSummary implements TaskSummary {
     @XmlElement(name="parent-id")
     @XmlSchemaType(name="long")
     private Long parentId;
-    
+   
+    @Deprecated // remove in 7.0 
     @XmlElement(name="potential-owner")
     private List<String> potentialOwners;
 
@@ -129,12 +130,16 @@ public class JaxbTaskSummary implements TaskSummary {
         this.priority = taskSum.getPriority();
         this.skipable = taskSum.isSkipable();
         User actual = taskSum.getActualOwner();
-        if( actual != null ) { 
+        if( actual != null ) {
             this.actualOwnerId = actual.getId();
+        } else {
+            this.actualOwnerId = taskSum.getActualOwnerId();
         }
         User created = taskSum.getCreatedBy();
-        if( created != null ) { 
+        if( created != null ) {
            this.createdById = created.getId(); 
+        } else {
+            this.createdById = taskSum.getCreatedById();
         }
         this.createdOn = taskSum.getCreatedOn();
         this.activationTime = taskSum.getActivationTime();
@@ -312,10 +317,12 @@ public class JaxbTaskSummary implements TaskSummary {
         this.processSessionId = processSessionId;
     }
 
+    @Deprecated // remove in 7.0 
     public List<String> getPotentialOwners() {
         return potentialOwners;
     }
 
+    @Deprecated // remove in 7.0 
     public void setPotentialOwners(List<String> potentialOwners) {
         this.potentialOwners = potentialOwners;
     }

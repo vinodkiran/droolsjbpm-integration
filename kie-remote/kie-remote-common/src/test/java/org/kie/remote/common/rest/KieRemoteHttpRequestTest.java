@@ -1,18 +1,30 @@
-package org.kie.remote.common.rest;
-
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 /*
  * Copyright (c) 2014 Kevin Sawicki <kevinsawicki@gmail.com>
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
  * deal in the Software without restriction, including without limitation the
  * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
  * sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,6 +33,10 @@ package org.kie.remote.common.rest;
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+
+package org.kie.remote.common.rest;
+
+
 
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_CREATED;
@@ -580,11 +596,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
             public void handle( Request request, HttpServletResponse response ) {
                 String auth = request.getHeader("Authorization");
                 auth = auth.substring(auth.indexOf(' ') + 1);
-                try {
-                    auth = B64Code.decode(auth, CHARSET_UTF8);
-                } catch( UnsupportedEncodingException e ) {
-                    throw new RuntimeException(e);
-                }
+                auth = B64Code.decode(auth, CHARSET_UTF8);
                 int colon = auth.indexOf(':');
                 user.set(auth.substring(0, colon));
                 password.set(auth.substring(colon + 1));
@@ -843,7 +855,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
             }
         };
         Map<String, List<String>> headers = newRequest(url).get().response().headers();
-        assertEquals(headers.size(), 5);
+        assertEquals(headers.size(), 6);
         assertEquals(headers.get("a").size(), 2);
         assertTrue(headers.get("b").get(0).equals("b"));
     }
@@ -869,7 +881,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         KieRemoteHttpRequest request = newRequest(url).header("h1", 5).header("h2", (Number) null);
         assertEquals(HTTP_OK, request.get().response().code());
         assertEquals("5", h1.get());
-        assertEquals("", h2.get());
+        assertEquals(null, h2.get());
     }
 
     /**

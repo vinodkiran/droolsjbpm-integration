@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.kie.remote.jaxb.gen;
 
 import static org.junit.Assert.assertTrue;
@@ -32,14 +47,19 @@ public class OriginalClassesSerializationTest {
       
         int i = 0;
         for (Class<?> cmdClass : reflections.getTypesAnnotatedWith(XmlAccessorType.class) ) {
-            if( cmdClass.getAnnotation(XmlEnum.class) != null ) { 
+            if( cmdClass.getAnnotation(XmlEnum.class) != null || cmdClass.isAnonymousClass()) {
+                continue;
+            }
+            if( cmdClass.isAnonymousClass() ) { 
+                // query builders
                 continue;
             }
             ++i;
             try {
+                
                 cmdClass.getConstructor(new Class[0]);
             } catch (Exception e) {
-                fail("Class " + cmdClass.getSimpleName() + " does not have a no-arg constructor.");
+                fail("Class " + cmdClass.getSimpleName() + " does not have a no-arg constructor. " + e.getMessage());
             }
         }
         assertTrue( "No classes checked! [" + i + "]", i > 30 );

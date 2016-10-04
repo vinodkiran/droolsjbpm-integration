@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie.remote</groupId>
     <artifactId>kie-remote</artifactId>
-    <version>6.3.0-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-remote-jaxb-gen</artifactId>
@@ -13,6 +13,10 @@
 
   <dependencies>
     <!-- jaxb -->
+    <dependency>
+      <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-core</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-impl</artifactId>
@@ -44,6 +48,11 @@
       <artifactId>jbpm-audit</artifactId>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-query-jpa</artifactId>
+      <optional>true</optional>
+    </dependency>
 
     <!-- other dependencies -->
     <dependency>
@@ -51,6 +60,11 @@
       <artifactId>jackson-core-asl</artifactId>
       <optional>true</optional>
     </dependency> 
+    <dependency>
+      <groupId>org.kie.remote</groupId>
+      <artifactId>kie-remote-jaxb</artifactId>
+      <optional>true</optional>
+    </dependency>
 
     <!-- test -->
     <dependency>
@@ -73,9 +87,20 @@
 
   <build>
     <plugins>
-      <!-- 0. deleted unpacked and generated classes -->
+      <!-- 0. delete unpacked and generated classes -->
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
+        <executions>
+          <!-- We need to delete the generated resources before every single build to make it all work.
+               (even when running just "mvn install", instead of "mvn clean install") -->
+          <execution>
+            <id>clean-generated-resources</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
           <filesets>
             <fileset>
@@ -89,26 +114,6 @@
             </fileset>
           </filesets>
         </configuration>
-      </plugin>
-
-      <!-- 0. add src/main/generated so that generated classes are added to jar -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>add-generated-sources</id>
-            <phase>inititalize</phase>
-            <goals>
-              <goal>add-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>src/main/generated</source>
-              </sources>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
 
       <!-- 1. unpack original sources of Command implementation java code -->
@@ -133,9 +138,14 @@
                   <outputDirectory>${basedir}/src/main/java</outputDirectory>
                   <includes>org/drools/core/command/impl/GenericCommand.java,
                     org.drools.core.xml.jaxb.util.JaxbUnknownAdapter.java,
-                    org/drools/core/command/runtime/process/*WorkItemCommand.java,
+                    org/drools/core/command/runtime/process/CompleteWorkItemCommand.java,
+                    org/drools/core/command/runtime/process/AbortWorkItemCommand.java,
+                    org/drools/core/command/runtime/process/GetWorkItemCommand.java,
                     org/drools/core/command/runtime/process/AbortProcessInstanceCommand.java,
-                    org/drools/core/command/runtime/process/GetProcess*Command.java,
+                    org/drools/core/command/runtime/process/GetProcessIdsCommand.java,
+                    org/drools/core/command/runtime/process/GetProcessInstanceByCorrelationKeyCommand.java,
+                    org/drools/core/command/runtime/process/GetProcessInstanceCommand.java,
+                    org/drools/core/command/runtime/process/GetProcessInstancesCommand.java,
                     org/drools/core/command/runtime/process/SetProcess*Command.java,
                     org/drools/core/command/runtime/process/SignalEventCommand.java,
                     org/drools/core/command/runtime/process/Start*ProcessCommand.java,
@@ -172,13 +182,16 @@
                     org/jbpm/services/task/commands/Start*.java,
                     org/jbpm/services/task/commands/Stop*.java,
                     org/jbpm/services/task/commands/Suspend*.java,
+                    org/jbpm/services/task/commands/GetTask*Command.java,
                     org/jbpm/services/task/commands/ProcessSubTaskCommand.java,
                     org/jbpm/services/task/commands/ExecuteTaskRulesCommand.java,
                     org/jbpm/services/task/commands/CancelDeadlineCommand.java,
                     org/jbpm/services/task/commands/GetAttachmentCommand.java,
-                    org/jbpm/services/task/commands/GetContentCommand.java,
-                    org/jbpm/services/task/commands/GetTask*Command.java,
-                    org/jbpm/services/task/impl/model/xml/JaxbContent.java</includes>
+                    org/jbpm/services/task/commands/*Content*Command.java,
+                    org/jbpm/services/task/impl/model/xml/JaxbContent.java,
+                    org/jbpm/services/task/commands/*Comment*Command.java,
+                    org/jbpm/services/task/commands/SetTaskPropertyCommand.java,
+                    org/jbpm/services/task/commands/TaskSummaryQueryCommand.java</includes>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.jbpm</groupId>
@@ -202,7 +215,6 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>xml-maven-plugin</artifactId>
-        <version>1.0</version>
         <executions>
           <execution>
             <id>modify-xsd-schema</id>
@@ -238,11 +250,10 @@
               <goal>schemagen</goal>
             </goals>
             <configuration>
-              <includes>
-                <include>org/drools/**/*.java</include>
-                <include>org/jbpm/**/*.java</include>
-              </includes>
-              <verbose>true</verbose>
+              <sources>
+                <source>${project.basedir}/src/main/java/org/drools</source>
+                <source>${project.basedir}/src/main/java/org/jbpm</source>
+              </sources>
               <outputDirectory>${project.build.directory}/generated-xsd/</outputDirectory>
             </configuration>
           </execution>
@@ -256,8 +267,12 @@
             <configuration>
               <packageName>org.kie.remote.jaxb.gen</packageName>
               <outputDirectory>${basedir}/src/main/generated</outputDirectory>
-              <schemaDirectory>${project.build.directory}/generated-xsd/</schemaDirectory>
-              <bindingDirectory>${basedir}/src/main/resources/xjb/</bindingDirectory>
+              <sources>
+                <source>${project.build.directory}/generated-xsd/schema1.xsd</source>
+              </sources>
+              <xjbSources>
+                <xjbSource>${project.basedir}/src/main/resources/xjb/</xjbSource>
+              </xjbSources>
               <extension>true</extension>
             </configuration>
           </execution>

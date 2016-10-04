@@ -97,6 +97,32 @@
     </xsd:complexType>
   </xsd:element>
 
+  <xsd:element name="import">
+    <xsd:complexType>
+      <xsd:attribute name="releaseId-ref" use="optional" type="xsd:string"/>
+      <xsd:attribute name="enableScanner" use="optional" type="xsd:boolean"/>
+      <xsd:attribute name="scannerInterval" use="optional" type="xsd:int" default="30"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="import-session">
+    <xsd:complexType>
+      <xsd:attribute name="name" use="required" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="import-base">
+    <xsd:complexType>
+      <xsd:attribute name="name" use="required" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="import-scanner">
+    <xsd:complexType>
+      <xsd:attribute name="name" use="required" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
   <xsd:element name="kcontainer-ref">
     <xsd:complexType>
       <xsd:attribute name="id" use="required" type="xsd:ID"/>
@@ -174,6 +200,8 @@
         <xsd:element ref="scoped-entity-manager" minOccurs="0" maxOccurs="1"/>
         <xsd:element ref="date-formats" minOccurs="0" maxOccurs="1"/>
         <xsd:element ref="calendars" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="user-transaction" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="transaction-sync-registry" minOccurs="0" maxOccurs="1"/>
       </xsd:all>
       <xsd:attribute name="id" use="required" type="xsd:ID"/>
     </xsd:complexType>
@@ -203,6 +231,8 @@
 
   <xsd:element name="scoped-entity-manager" type="generic-scoped-entitymanager"/>
 
+  <xsd:element name="user-transaction" type="generic-ref-or-nested-type"/>
+  <xsd:element name="transaction-sync-registry" type="generic-ref-or-nested-type"/>
   <xsd:element name="transaction-manager" type="generic-ref-or-nested-type"/>
   <xsd:element name="entity-manager-factory" type="generic-ref-or-nested-type"/>
   <xsd:element name="globals" type="generic-ref-or-nested-type"/>

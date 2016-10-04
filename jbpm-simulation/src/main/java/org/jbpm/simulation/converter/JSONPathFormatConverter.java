@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.jbpm.simulation.converter;
 
 import java.util.List;
@@ -15,7 +30,7 @@ public class JSONPathFormatConverter implements PathFormatConverter<JSONObject> 
         JSONObject parent = new JSONObject();
         JSONObject paths = new JSONObject();
         try {
-            if(completePaths != null && completePaths.size() > 0) {
+            if(completePaths != null && !completePaths.isEmpty()) {
                 for(PathContext pc : completePaths) {
                     paths.put(pc.getPathId(), getPathFlowElementsAsString(pc.getPathElements()));
                 }
@@ -30,7 +45,7 @@ public class JSONPathFormatConverter implements PathFormatConverter<JSONObject> 
     
     private String getPathFlowElementsAsString(Set<FlowElement> flowElements) {
         String ret = "";
-        if(flowElements != null && flowElements.size() > 0) {
+        if(flowElements != null && !flowElements.isEmpty()) {
             for(FlowElement fe : flowElements) {
                 ret += fe.getId();
                 ret += "|";

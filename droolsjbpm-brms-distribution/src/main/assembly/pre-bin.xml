@@ -19,6 +19,10 @@
         <include>org.kie:kie-ci</include>
         <include>org.kie:kie-ci-osgi</include>
         <include>org.kie:kie-spring</include>
+        <include>org.kie.remote:kie-remote-common</include>
+        <include>org.kie.server:kie-server-api</include>
+        <include>org.kie.server:kie-server-client</include>
+        <include>org.kie:kie-karaf-features</include>
         <include>org.drools:drools-core</include>
         <include>org.drools:drools-compiler</include>
         <include>org.drools:drools-decisiontables</include>
@@ -30,7 +34,6 @@
         <include>org.drools:drools-scorecards</include>
         <include>org.drools:drools-templates</include>
         <include>org.drools:drools-verifier</include>
-        <include>org.drools:knowledge-api</include>
       </includes>
       <outputDirectory></outputDirectory>
     </dependencySet>
@@ -47,6 +50,10 @@
         <exclude>org.kie:kie-ci</exclude>
         <exclude>org.kie:kie-ci-osgi</exclude>
         <exclude>org.kie:kie-spring</exclude>
+        <exclude>org.kie.remote:kie-remote-common</exclude>
+        <exclude>org.kie.server:kie-server-api</exclude>
+        <exclude>org.kie.server:kie-server-client</exclude>
+        <exclude>org.kie:kie-karaf-features</exclude>
         <exclude>org.drools:drools-core</exclude>
         <exclude>org.drools:drools-compiler</exclude>
         <exclude>org.drools:drools-decisiontables</exclude>
@@ -58,7 +65,6 @@
         <exclude>org.drools:drools-scorecards</exclude>
         <exclude>org.drools:drools-templates</exclude>
         <exclude>org.drools:drools-verifier</exclude>
-        <exclude>org.drools:knowledge-api</exclude>
       </excludes>
       <outputDirectory>lib</outputDirectory>
     </dependencySet>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 JBoss Inc
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ class AnnotationsPostProcessor implements InstantiationAwareBeanPostProcessor,
 
     public static final String KIE_ANNOTATIONS_ARE_NOT_SUPPORTED_ON_STATIC_METHODS = "Kie Annotations are not supported on static methods";
     public static final String INJECTION_OF_KIE_DEPENDENCIES_FAILED = "Injection of kie dependencies failed";
-    private transient final Map<Class<?>, InjectionMetadata> injectionMetadataCache = new ConcurrentHashMap<Class<?>, InjectionMetadata>();
+    private final transient Map<Class<?>, InjectionMetadata> injectionMetadataCache = new ConcurrentHashMap<Class<?>, InjectionMetadata>();
     private int order = Ordered.LOWEST_PRECEDENCE - 4;
     private transient ListableBeanFactory beanFactory;
     private ReleaseId releaseId;

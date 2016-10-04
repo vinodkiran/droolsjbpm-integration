@@ -1,14 +1,31 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.kie.remote.client.jaxb;
 
+import static org.kie.remote.client.internal.command.AbstractRemoteCommandObject.unsupported;
 import static org.kie.remote.client.jaxb.ConversionUtil.convertXmlGregCalToDate;
-import static org.kie.services.client.api.command.AbstractRemoteCommandObject.unsupported;
 
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.kie.api.task.model.Attachment;
 import org.kie.api.task.model.Comment;
@@ -83,7 +100,7 @@ abstract class JaxbWrapper {
     /**
      * Represents a {@link Task} instance
      */
-    static class JaxbTaskWrapper extends JaxbWrapper implements InternalTask {
+     static final class JaxbTaskWrapper extends JaxbWrapper implements InternalTask {
     
         private final org.kie.remote.jaxb.gen.Task task;
     
@@ -261,7 +278,7 @@ abstract class JaxbWrapper {
     /**
      * Represents a {@link TaskData} instance
      */
-    static class JaxbTaskDataWrapper extends JaxbWrapper implements TaskData {
+    static final class JaxbTaskDataWrapper extends JaxbWrapper implements TaskData {
     
         private final org.kie.remote.jaxb.gen.TaskData taskData;
     
@@ -351,7 +368,7 @@ abstract class JaxbWrapper {
         }
     
         @Override
-        public long getOutputContentId() {
+        public Long getOutputContentId() {
             return this.taskData.getOutputContentId();
         }
     
@@ -398,10 +415,20 @@ abstract class JaxbWrapper {
         public long getParentId() {
             return this.taskData.getParentId();
         }
-        
+
+        @Override
+        public Map<String, Object> getTaskInputVariables() {
+            return new HashMap<String, Object>();
+        }
+
+        @Override
+        public Map<String, Object> getTaskOutputVariables() {
+            return new HashMap<String, Object>();
+        }
+
     }
 
-    static class JaxbAttachmentWrapper extends JaxbWrapper implements Attachment {
+    static final class JaxbAttachmentWrapper extends JaxbWrapper implements Attachment {
     
         private final org.kie.remote.jaxb.gen.Attachment attachment;
         
@@ -446,7 +473,7 @@ abstract class JaxbWrapper {
         }
     }
 
-    static class JaxbCommentWrapper extends JaxbWrapper implements Comment {
+    static final class JaxbCommentWrapper extends JaxbWrapper implements Comment {
     
         private final org.kie.remote.jaxb.gen.Comment comment;
     
@@ -476,7 +503,7 @@ abstract class JaxbWrapper {
         }
     }
 
-    static class JaxbContentWrapper extends JaxbWrapper implements Content {
+    static final class JaxbContentWrapper extends JaxbWrapper implements Content {
 
         private final org.kie.remote.jaxb.gen.Content content;
 
@@ -486,7 +513,7 @@ abstract class JaxbWrapper {
         }
 
         @Override
-        public long getId() {
+        public Long getId() {
             return content.getId();
         }
 
@@ -497,7 +524,7 @@ abstract class JaxbWrapper {
        
     }
 
-    static class JaxbI18NTextWrapper extends JaxbWrapper implements I18NText {
+    static final class JaxbI18NTextWrapper extends JaxbWrapper implements I18NText {
     
         private final org.kie.remote.jaxb.gen.I18NText i18nText;
     
@@ -522,7 +549,7 @@ abstract class JaxbWrapper {
         }
     }
 
-    static class JaxbPeopleAssignmentsWrapper extends JaxbWrapper implements InternalPeopleAssignments {
+    static final class JaxbPeopleAssignmentsWrapper extends JaxbWrapper implements InternalPeopleAssignments {
     
         private final org.kie.remote.jaxb.gen.PeopleAssignments peopleAssignments;
     
@@ -595,7 +622,7 @@ abstract class JaxbWrapper {
     /**
      * Represents a {@link Group} instance
      */
-    static class GroupWrapper extends JaxbWrapper implements Group {
+    static final class GroupWrapper extends JaxbWrapper implements Group {
         
         private final String id;
         public GroupWrapper(String id) {
@@ -612,7 +639,7 @@ abstract class JaxbWrapper {
     /**
      * Represents a {@link User} instance
      */
-    static class UserWrapper extends JaxbWrapper implements User {
+    static final class UserWrapper extends JaxbWrapper implements User {
         
         private final String id;
         public UserWrapper(String id) {

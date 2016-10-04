@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.jbpm.simulation.impl;
 
 import java.io.BufferedReader;
@@ -145,13 +160,13 @@ public class BPMN2PathFinderImpl implements PathFinder {
                 processEventDefinitions(fElement, eventDefinitions, catchingEvents);
             } else if((fElement instanceof Activity) && BPMN2Utils.isContainerAdHoc(container)) {
                 Activity act = (Activity) fElement;
-                if(act.getIncoming() == null || act.getIncoming().size() == 0) {
+                if(act.getIncoming() == null || act.getIncoming().isEmpty()) {
                     triggerElements.add(0, fElement);
                 }
             } else if (fElement instanceof IntermediateCatchEvent) {
                 
                 IntermediateCatchEvent act = (IntermediateCatchEvent) fElement;
-                if(act.getIncoming() == null || act.getIncoming().size() == 0) {
+                if(act.getIncoming() == null || act.getIncoming().isEmpty()) {
                     triggerElements.add(0, fElement);
                 } 
                 

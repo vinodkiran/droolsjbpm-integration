@@ -1,8 +1,27 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.kie.remote.services.rest;
+
+import static org.kie.internal.remote.PermissionConstants.*;
+import static org.kie.internal.remote.PermissionConstants.REST_ROLE;
 
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -23,7 +42,7 @@ import org.jbpm.services.task.commands.DelegateTaskCommand;
 import org.jbpm.services.task.commands.ExitTaskCommand;
 import org.jbpm.services.task.commands.FailTaskCommand;
 import org.jbpm.services.task.commands.ForwardTaskCommand;
-import org.jbpm.services.task.commands.GetContentCommand;
+import org.jbpm.services.task.commands.GetContentByIdCommand;
 import org.jbpm.services.task.commands.GetTaskCommand;
 import org.jbpm.services.task.commands.NominateTaskCommand;
 import org.jbpm.services.task.commands.ReleaseTaskCommand;
@@ -91,6 +110,7 @@ public class TaskResourceImpl extends ResourceBase {
 
     @GET
     @Path("/query")
+    @RolesAllowed({REST_ROLE, REST_QUERY_ROLE})
     @Deprecated
     public Response query() {
         return queryResource.taskSummaryQuery();
@@ -98,6 +118,7 @@ public class TaskResourceImpl extends ResourceBase {
    
     @GET
     @Path("/{taskId: [0-9-]+}")
+    @RolesAllowed({REST_ROLE, REST_TASK_RO_ROLE, REST_TASK_ROLE})
     public Response getTask(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
         JaxbTask task = (JaxbTask) doRestTaskOperationWithTaskId(taskId, cmd);
@@ -109,6 +130,7 @@ public class TaskResourceImpl extends ResourceBase {
 
     @POST
     @Path("/{taskId: [0-9-]+}/{oper: [a-zA-Z]+}")
+    @RolesAllowed({REST_ROLE, REST_TASK_ROLE})
     public Response doTaskOperation(@PathParam("taskId") long taskId, @PathParam("oper") String operation) { 
         Map<String, String[]> params = getRequestParams();
         operation = checkThatOperationExists(operation, allowedOperations);
@@ -169,9 +191,11 @@ public class TaskResourceImpl extends ResourceBase {
         }
         throw KieRemoteRestOperationException.badRequest("Operation '" + operation + "' is not supported on tasks.");
     }
-    
+   
+    // TODO: in 7, make sure to use GetContentByIdForUserCommand
     @GET
     @Path("/{taskId: [0-9-]+}/content")
+    @RolesAllowed({REST_ROLE, REST_TASK_RO_ROLE, REST_TASK_ROLE})
     public Response getTaskContentByTaskId(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
         Object result = doRestTaskOperationWithTaskId(taskId, cmd);
@@ -180,19 +204,20 @@ public class TaskResourceImpl extends ResourceBase {
         }
         Task task = ((Task) result);
         long contentId = task.getTaskData().getDocumentContentId();
-        JaxbContent content = null;
+        JaxbContent jaxbContent = null;
         if( contentId > -1 ) { 
-            cmd = new GetContentCommand(contentId);
+            cmd = new GetContentByIdCommand(contentId);
             result = processRequestBean.doRestTaskOperation(taskId, task.getTaskData().getDeploymentId(), task.getTaskData().getProcessInstanceId(), task, cmd);
-            content = (JaxbContent) result;
+            jaxbContent = (JaxbContent) result;
         } else { 
             throw KieRemoteRestOperationException.notFound("Content for task " + taskId + " could not be found.");
         }
-        return createCorrectVariant(content, headers);
+        return createCorrectVariant(jaxbContent, headers);
     }
     
     @GET
     @Path("/{taskId: [0-9-]+}/showTaskForm")
+    @RolesAllowed({REST_ROLE, REST_TASK_RO_ROLE, REST_TASK_ROLE})
     public Response getTaskFormByTaskId(@PathParam("taskId") long taskId) {
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
         Object result = doRestTaskOperationWithTaskId(taskId, cmd);
@@ -213,20 +238,23 @@ public class TaskResourceImpl extends ResourceBase {
         throw KieRemoteRestOperationException.notFound("Task " + taskId + " could not be found.");
     }
     
+    // TODO: in 7, make sure to use GetContentByIdForUserCommand
     @GET
     @Path("/content/{contentId: [0-9-]+}")
+    @RolesAllowed({REST_ROLE, REST_TASK_RO_ROLE, REST_TASK_ROLE})
     public Response getTaskContentByContentId(@PathParam("contentId") long contentId) { 
-        TaskCommand<?> cmd = new GetContentCommand(contentId);
+        TaskCommand<?> cmd = new GetContentByIdCommand(contentId);
         cmd.setUserId(identityProvider.getName());
-        JaxbContent content = (JaxbContent) doRestTaskOperation(cmd);
-        if( content == null ) { 
+        JaxbContent jaxbContent = (JaxbContent) doRestTaskOperation(cmd);
+        if( jaxbContent == null ) { 
             throw KieRemoteRestOperationException.notFound("Content " + contentId + " could not be found.");
         }
-        return createCorrectVariant(new JaxbContent(content), headers);
+        return createCorrectVariant(jaxbContent, headers);
     }
     
     @POST
     @Path("/history/bam/clear")
+    @RolesAllowed({REST_ROLE, REST_TASK_ROLE})
     public Response clearTaskBamHistory() { 
         doRestTaskOperation(new DeleteBAMTaskSummariesCommand());
         return createCorrectVariant(new JaxbGenericResponse(getRelativePath()), headers);

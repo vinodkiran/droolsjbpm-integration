@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.jbpm.process.svg;
 
 import java.io.IOException;
@@ -51,12 +66,12 @@ public class SVGImageProcessor {
     public static String transform(InputStream svg, List<String> completed, List<String> active) {
         SVGImageProcessor processor = new SVGImageProcessor(svg);
         for (String nodeId : completed) {
-            processor.defaultCompletedTransformation(nodeId);
+            if (!active.contains(nodeId)) {
+                processor.defaultCompletedTransformation(nodeId);
+            }
         }
         for (String nodeId : active) {
-            if (!completed.contains(nodeId)) {
-                processor.defaultActiveTransformation(nodeId);
-            }
+            processor.defaultActiveTransformation(nodeId);
         }
         return processor.getSVG();
     }
@@ -64,12 +79,13 @@ public class SVGImageProcessor {
     public static String transformByName(InputStream svg, List<String> completed, List<String> active) {
         SVGImageProcessor processor = new SVGImageProcessor(svg, false);
         for (String nodeId : completed) {
-            processor.defaultCompletedTransformation(nodeId);
+            if (!active.contains(nodeId)) {
+                processor.defaultCompletedTransformation(nodeId);
+            }
         }
         for (String nodeId : active) {
-            if (!completed.contains(nodeId)) {
-                processor.defaultActiveTransformation(nodeId);
-            }
+            processor.defaultActiveTransformation(nodeId);
+
         }
         return processor.getSVG();
     }

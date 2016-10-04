@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 JBoss Inc
+ * Copyright 2010 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,6 +118,8 @@ public abstract class AbstractKieSpringJpaManager
                 this.appScopedEntityManager = null;
             }
             this.endCommandScopedEntityManager();
+        }  else {
+            logger.debug("Not cleaning application scoped manager em holder = {} em = {}", TransactionSynchronizationManager.getResource(this.emf), this.env.get(EnvironmentName.APP_SCOPED_ENTITY_MANAGER));
         }
     }
 

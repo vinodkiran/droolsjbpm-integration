@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 JBoss Inc
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.drools.core.process.instance.WorkItemManagerFactory;
 import org.drools.core.time.TimerService;
 import org.drools.persistence.SingleSessionCommandService;
+import org.drools.persistence.TransactionManagerFactory;
 import org.drools.persistence.infinispan.processinstance.InfinispanWorkItemManagerFactory;
-import org.drools.persistence.jta.JtaTransactionManager;
 import org.kie.api.KieBase;
 import org.kie.api.persistence.jpa.KieStoreServices;
 import org.kie.api.runtime.CommandExecutor;
@@ -62,7 +62,7 @@ public class KnowledgeStoreServiceImpl
                                                   KieSessionConfiguration configuration,
                                                   Environment environment) {
         if ( configuration == null ) {
-            configuration = new SessionConfiguration();
+            configuration = SessionConfiguration.newInstance();
         }
 
         if ( environment == null ) {
@@ -95,7 +95,7 @@ public class KnowledgeStoreServiceImpl
                                                    KieSessionConfiguration configuration,
                                                    Environment environment) {
         if ( configuration == null ) {
-            configuration = new SessionConfiguration();
+            configuration = SessionConfiguration.newInstance();
         }
 
         if ( environment == null ) {
@@ -127,7 +127,7 @@ public class KnowledgeStoreServiceImpl
             KieSessionConfiguration configuration,
             Environment environment) {
         if ( configuration == null ) {
-            configuration = new SessionConfiguration();
+            configuration = SessionConfiguration.newInstance();
         }
 
         if ( environment == null ) {
@@ -202,13 +202,12 @@ public class KnowledgeStoreServiceImpl
     		}
     	}
     	Object tm = env.get(EnvironmentName.TRANSACTION_MANAGER);
-    	if (tm != null && tm instanceof javax.transaction.TransactionManager) {
+    	if (tm instanceof javax.transaction.TransactionManager) {
     		Object ut = env.get(EnvironmentName.TRANSACTION);
-    		if (ut == null && tm instanceof javax.transaction.Transaction) {
-    			ut = tm;
+    		if (ut == null && tm instanceof javax.transaction.UserTransaction) {
+    		    env.set(EnvironmentName.TRANSACTION, tm);
     		}
-    		Object tsr = env.get(EnvironmentName.TRANSACTION_SYNCHRONIZATION_REGISTRY);
-    		env.set(EnvironmentName.TRANSACTION_MANAGER, new JtaTransactionManager(ut, tsr, tm));
+            env.set(EnvironmentName.TRANSACTION_MANAGER, TransactionManagerFactory.get().newTransactionManager(env));
     	}
     	return env;
     }
@@ -241,19 +240,7 @@ public class KnowledgeStoreServiceImpl
     }
 
     private KieSessionConfiguration mergeConfig(KieSessionConfiguration configuration) {
-        ((SessionConfiguration) configuration).addDefaultProperties(configProps);
-        try {
-        	
-        	java.lang.reflect.Field field = SessionConfiguration.class.getDeclaredField("timerJobFactoryManager");
-        	field.setAccessible(true);
-        	Object obj = field.get(configuration);
-        	if (obj == null) {
-        		field.set(configuration, new InfinispanTimeJobFactoryManager());
-        	}
-        } catch (Exception e) {
-        	throw new IllegalStateException("Couldn't set TimeJobFactoryManager", e);
-        }
-        return configuration;
+        return ((SessionConfiguration) configuration).addDefaultProperties(configProps);
     }
 
     public long getStatefulKnowledgeSessionId(StatefulKnowledgeSession ksession) {

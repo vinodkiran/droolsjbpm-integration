@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.jbpm.simulation.impl;
 
 import java.io.ByteArrayInputStream;
@@ -200,7 +215,7 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
         Set<String> processedSourceElems = new LinkedHashSet<String>();
         for (String sequenceFlowId : path.getSequenceFlowsIds()) {
             String sourceElemId = path.getSeqenceFlowsSources().get(sequenceFlowId);
-            // need to check if given source (gateway) was already processed as it can be twice or more when loops are
+            // need to test if given source (gateway) was already processed as it can be twice or more when loops are
             // modeled in the process, for probability counting only single outgoing flow is taken - currently supports
             // only XOR and AND gateways
             if (processedSourceElems.contains(sourceElemId)) {
@@ -274,7 +289,7 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
                 List<EventDefinition> defs = boundaryEvent.getEventDefinitions();
                 String eventDef = "";
 
-                if (defs != null && defs.size() > 0) {
+                if (defs != null && !defs.isEmpty()) {
                     eventDef = getEventDefinitionAsString(defs.get(0));
                 }
 
@@ -284,7 +299,7 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
                 List<EventDefinition> defs = boundaryEvent.getEventDefinitions();
                 String eventDef = "";
 
-                if (defs != null && defs.size() > 0) {
+                if (defs != null && !defs.isEmpty()) {
                     eventDef = getEventDefinitionAsString(defs.get(0));
                 }
                 nodeProperties.put("node.type", "IntermediateCatchEvent:"+eventDef);
@@ -293,7 +308,7 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
                 List<EventDefinition> defs = boundaryEvent.getEventDefinitions();
                 String eventDef = "";
 
-                if (defs != null && defs.size() > 0) {
+                if (defs != null && !defs.isEmpty()) {
                     eventDef = getEventDefinitionAsString(defs.get(0));
                 }
                 nodeProperties.put("node.type", "IntermediateThrowEvent:"+eventDef);
@@ -302,7 +317,7 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
                 List<EventDefinition> defs = boundaryEvent.getEventDefinitions();
                 String eventDef = "";
 
-                if (defs != null && defs.size() > 0) {
+                if (defs != null && !defs.isEmpty()) {
                     eventDef = getEventDefinitionAsString(defs.get(0));
                 }
                 nodeProperties.put("node.type", "StartEvent:"+eventDef);
@@ -311,7 +326,7 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
                 List<EventDefinition> defs = boundaryEvent.getEventDefinitions();
                 String eventDef = "";
 
-                if (defs != null && defs.size() > 0) {
+                if (defs != null && !defs.isEmpty()) {
                     eventDef = getEventDefinitionAsString(defs.get(0));
                 }
                 nodeProperties.put("node.type", "EndEvent:"+eventDef);
@@ -331,16 +346,16 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
     }
     
     private Scenario getDefaultScenario(Definitions def) {
-    	if(def.getRelationships() != null && def.getRelationships().size() > 0) {
+    	if(def.getRelationships() != null && !def.getRelationships().isEmpty()) {
         	// current support for single relationship
         	Relationship relationship = def.getRelationships().get(0);
         	for(ExtensionAttributeValue extattrval : relationship.getExtensionValues()) {
                 FeatureMap extensionElements = extattrval.getValue();
                 @SuppressWarnings("unchecked")
                 List<BPSimDataType> bpsimExtension = (List<BPSimDataType>) extensionElements.get(BpsimPackage.Literals.DOCUMENT_ROOT__BP_SIM_DATA, true);
-                if(bpsimExtension != null && bpsimExtension.size() > 0) {
+                if(bpsimExtension != null && !bpsimExtension.isEmpty()) {
                     BPSimDataType bpmsim = bpsimExtension.get(0);
-                	if(bpmsim.getScenario() != null && bpmsim.getScenario().size() > 0) {
+                	if(bpmsim.getScenario() != null && !bpmsim.getScenario().isEmpty()) {
                 		return bpmsim.getScenario().get(0);
                 	}
                 }

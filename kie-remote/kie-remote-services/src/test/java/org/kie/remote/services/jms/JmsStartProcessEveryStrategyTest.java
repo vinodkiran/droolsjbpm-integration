@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.kie.remote.services.jms;
 
 import static org.junit.Assert.assertEquals;
@@ -19,6 +34,7 @@ import org.jbpm.services.api.UserTaskService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.command.Command;
+import org.kie.api.runtime.manager.Context;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
@@ -110,6 +126,7 @@ public class JmsStartProcessEveryStrategyTest extends RequestMessageBean impleme
         // test start process
         JaxbCommandsRequest 
         cmdsRequest = new JaxbCommandsRequest(DEPLOYMENT_ID, new StartProcessCommand(TEST_PROCESS_DEF_NAME));
+        cmdsRequest.setCorrelationKeyString("anton");
         JaxbCommandsResponse
         resp = this.jmsProcessJaxbCommandsRequest(cmdsRequest);
 
@@ -125,7 +142,7 @@ public class JmsStartProcessEveryStrategyTest extends RequestMessageBean impleme
         assertNotNull( "Null process instance", procInstResp);
         assertEquals( "Invalid process instance id", TEST_PROCESS_INST_ID, procInstResp.getId() );
         
-        // Do rest call with process instance id this time. This will fail if: 
+        // Do jms call with process instance id this time. This will fail if: 
         // - the ProcessInstanceIdContext is not used (and an EmptyContext is used instead)
         // - The ProcessInstanceIdContext constructor gets a null value for the process instance id
         cmdsRequest = new JaxbCommandsRequest(DEPLOYMENT_ID, new SignalEventCommand(TEST_PROCESS_INST_ID, "test", null));
@@ -142,7 +159,7 @@ public class JmsStartProcessEveryStrategyTest extends RequestMessageBean impleme
         assertFalse( "An exception was thrown!", realResp instanceof JaxbExceptionResponse );
         
        // verify ksession is called
-       verify(processServiceMock, times(2)).execute(any(String.class), any(Command.class));
+       verify(processServiceMock, times(2)).execute(any(String.class), any(Context.class), any(Command.class));
     }
     
 }

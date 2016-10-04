@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 JBoss Inc
+ * Copyright 2013 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ public class KBaseDefinitionParser extends AbstractBeanDefinitionParser {
 
         element.setAttribute("name", id);
         List<Element> ksessionElements = DomUtils.getChildElementsByTagName(element, "ksession");
-        if (ksessionElements != null && ksessionElements.size() > 0) {
+        if (ksessionElements != null && !ksessionElements.isEmpty()) {
             for (Element kbaseElement : ksessionElements){
                 BeanDefinitionHolder obj = (BeanDefinitionHolder) parserContext.getDelegate().parsePropertySubElement(kbaseElement, null);
                 obj.getBeanDefinition().getPropertyValues().addPropertyValue("kBaseName", id);

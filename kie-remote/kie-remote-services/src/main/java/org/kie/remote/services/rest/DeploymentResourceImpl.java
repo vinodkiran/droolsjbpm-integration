@@ -1,7 +1,26 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.kie.remote.services.rest;
+
+import static org.kie.internal.remote.PermissionConstants.REST_DEPLOYMENT_ROLE;
+import static org.kie.internal.remote.PermissionConstants.REST_ROLE;
 
 import java.util.Map;
 
+import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -24,36 +43,37 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This REST resource is responsible for retrieving information about and managing deployment units. 
+ * This REST resource is responsible for retrieving information about and managing deployment units.
  */
 @RequestScoped
 @Path("/deployment/{deploymentId: [\\w\\.-]+(:[\\w\\.-]+){2,2}(:[\\w\\.-]*){0,2}}")
 public class DeploymentResourceImpl extends ResourceBase {
 
     private static final Logger logger = LoggerFactory.getLogger(DeploymentResourceImpl.class);
-    
+
     /* REST information */
-    
+
     @Context
     private HttpHeaders headers;
-    
+
     @PathParam("deploymentId")
     private String deploymentId;
-    
+
     /* Deployment operations */
-   
-    @Inject 
+
+    @Inject
     private DeployResourceBase deployResourceBase;
-   
+
     // REST operations -----------------------------------------------------------------------------------------------------------
 
     /**
      * Retrieve the status of the {@link DeploymentUnit} specified in the URL.
-     * 
+     *
      * @return A {@link JaxbDeploymentUnit} instance
      */
     @GET
-    public Response getConfig() { 
+    @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
+    public Response getConfig() {
         JaxbDeploymentUnit jaxbDepUnit = deployResourceBase.determineStatus(deploymentId, true);
         logger.debug("Returning deployment unit information for " + deploymentId);
         return createCorrectVariant(jaxbDepUnit, headers);
@@ -62,37 +82,44 @@ public class DeploymentResourceImpl extends ResourceBase {
     /**
      * Queues a request to deploy the given deployment unit. If the deployment already exist, this
      * operation will fail.
-     * 
+     *
      * @param deployDescriptor An optional {@link DeploymentDescriptor} instance specifying additional information about how
      * the deployment unit should be deployed.
      * @return A {@link JaxbDeploymentJobResult} instance with the initial status of the job
      */
     @POST
     @Path("/deploy")
+    @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
     public Response deploy(JaxbDeploymentDescriptor deployDescriptor) {
-        // parse request/options 
+        JaxbDeploymentJobResult jobResult = doDeployOperation(deployDescriptor);
+        return createCorrectVariant(jobResult, headers, Status.ACCEPTED);
+    }
+
+    private JaxbDeploymentJobResult doDeployOperation(JaxbDeploymentDescriptor deployDescriptor) {
+        // parse request/options
         Map<String, String []> params = getRequestParams();
         String oper = getRelativePath();
         String strategy = getStringParam("strategy", false, params, oper);
         String mergeMode = getStringParam("mergemode", false, params, oper);
-        
+
         // schedule deployment
         JaxbDeploymentJobResult jobResult = deployResourceBase.submitDeployJob(deploymentId, strategy, mergeMode, deployDescriptor);
-        return createCorrectVariant(jobResult, headers, Status.ACCEPTED);
+        return jobResult;
     }
-   
+
     /**
      * Queues a request to undeploy the deployment unit specified in the URL
-     * 
+     *
      * @return A {@link JaxbDeploymentJobResult} instance with the initial status of the job
      */
     @POST
     @Path("/undeploy")
-    public Response undeploy() { 
+    @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
+    public Response undeploy() {
         JaxbDeploymentJobResult jobResult = deployResourceBase.submitUndeployJob(deploymentId);
         return createCorrectVariant(jobResult, headers, Status.ACCEPTED);
     }
-   
+
 
     /**
      * Returns a list of process definitions for the specified deployment.
@@ -100,21 +127,23 @@ public class DeploymentResourceImpl extends ResourceBase {
      */
     @GET
     @Path("/processes")
-    public Response listProcessDefinitions() { 
+    @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
+    public Response listProcessDefinitions() {
         String oper = getRelativePath();
         Map<String, String[]> params = getRequestParams();
         int [] pageInfo = getPageNumAndPageSize(params, oper);
-        int maxNumResults = getMaxNumResultsNeeded(pageInfo); 
-        
+        int maxNumResults = getMaxNumResultsNeeded(pageInfo);
+
         JaxbProcessDefinitionList jaxbProcDefList  = new JaxbProcessDefinitionList();
         deployResourceBase.fillProcessDefinitionList(deploymentId, pageInfo, maxNumResults, jaxbProcDefList.getProcessDefinitionList());
-        JaxbProcessDefinitionList resultList 
+        JaxbProcessDefinitionList resultList
             = paginateAndCreateResult(pageInfo, jaxbProcDefList.getProcessDefinitionList(), new JaxbProcessDefinitionList());
         return createCorrectVariant(resultList, headers);
     }
 
     @POST
     @Path("/activate")
+    @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
     public Response activate() {
         deployResourceBase.activate(deploymentId);
         return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
@@ -123,6 +152,7 @@ public class DeploymentResourceImpl extends ResourceBase {
 
     @POST
     @Path("/deactivate")
+    @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
     public Response deactivate() {
         deployResourceBase.deactivate(deploymentId);
         return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);

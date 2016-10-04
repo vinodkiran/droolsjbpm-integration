@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.jbpm.persistence.processinstance;
 
 import java.util.ArrayList;
@@ -42,13 +57,14 @@ public class InfinispanProcessInstanceManager
     // In a scenario in which 1000's of processes are running daily,
     //   lazy initialization is more costly than eager initialization
     // Added volatile so that if something happens, we can figure out what
-    private volatile transient ConcurrentHashMap<Long, ProcessInstance> processInstances = new ConcurrentHashMap<Long, ProcessInstance>();
+    private transient volatile ConcurrentHashMap<Long, ProcessInstance> processInstances = new ConcurrentHashMap<Long, ProcessInstance>();
 
     
     public void setKnowledgeRuntime(InternalKnowledgeRuntime kruntime) {
         this.kruntime = kruntime;
     }
 
+    @Override
     public void addProcessInstance(ProcessInstance processInstance, CorrelationKey correlationKey) {
         ProcessInstanceInfo processInstanceInfo = new ProcessInstanceInfo( processInstance, this.kruntime.getEnvironment() );
         ProcessPersistenceContext context 
@@ -67,7 +83,8 @@ public class InfinispanProcessInstanceManager
         }
         internalAddProcessInstance(processInstance);
     }
-    
+
+    @Override
     public void internalAddProcessInstance(ProcessInstance processInstance) {
         if( processInstances.putIfAbsent(processInstance.getId(), processInstance) != null ) { 
             throw new ConcurrentModificationException(
@@ -76,10 +93,12 @@ public class InfinispanProcessInstanceManager
         }
     }
 
+    @Override
     public ProcessInstance getProcessInstance(long id) {
         return getProcessInstance(id, false);
     }
 
+    @Override
     public ProcessInstance getProcessInstance(long id, boolean readOnly) {
         InternalRuntimeManager manager = (InternalRuntimeManager) kruntime.getEnvironment().get("RuntimeManager");
         if (manager != null) {
@@ -133,10 +152,12 @@ public class InfinispanProcessInstanceManager
         return processInstance;
     }
 
+    @Override
     public Collection<ProcessInstance> getProcessInstances() {
     	return Collections.unmodifiableCollection(processInstances.values());
     }
 
+    @Override
     public void removeProcessInstance(ProcessInstance processInstance) {
         ProcessPersistenceContext context = ((ProcessPersistenceContextManager) this.kruntime.getEnvironment().get( EnvironmentName.PERSISTENCE_CONTEXT_MANAGER )).getProcessPersistenceContext();
         ProcessInstanceInfo processInstanceInfo = context.findProcessInstanceInfo( processInstance.getId() );
@@ -147,16 +168,19 @@ public class InfinispanProcessInstanceManager
         internalRemoveProcessInstance(processInstance);
     }
 
+    @Override
     public void internalRemoveProcessInstance(ProcessInstance processInstance) {
         processInstances.remove( processInstance.getId() );
     }
-    
+
+    @Override
     public void clearProcessInstances() {
     	/*for (ProcessInstance processInstance: new ArrayList<ProcessInstance>(processInstances.values())) {
             ((ProcessInstanceImpl) processInstance).disconnect();
         }*/
     }
 
+    @Override
     public void clearProcessInstancesState() {
         try {
             // at this point only timers are considered as state that needs to be cleared

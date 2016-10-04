@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>6.3.0-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>droolsjbpm-bpms-distribution</artifactId>
@@ -110,6 +110,10 @@
     </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-services-cdi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
       <artifactId>jbpm-services-ejb-api</artifactId>
     </dependency>
     <dependency>
@@ -125,6 +129,18 @@
       <artifactId>jbpm-services-ejb-timer</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-case-mgmt-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-case-mgmt-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-document</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.kie.remote</groupId>
       <artifactId>kie-remote-client</artifactId>
     </dependency>
@@ -133,8 +149,8 @@
       <artifactId>kie-spring</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>knowledge-api</artifactId>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-client</artifactId>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
@@ -145,8 +161,8 @@
       <artifactId>drools-jsr94</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-karaf-features</artifactId>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-karaf-features</artifactId>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
@@ -207,8 +223,12 @@
       <artifactId>quartz-oracle</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.quartz-scheduler</groupId>
+      <artifactId>quartz-weblogic</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.jboss.spec.javax.security.jacc</groupId>
-      <artifactId>jboss-jacc-api_1.4_spec</artifactId>
+      <artifactId>jboss-jacc-api_1.5_spec</artifactId>
     </dependency>
 
     <!-- Javadocs and documentation -->

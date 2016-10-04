@@ -1,6 +1,22 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.kie.remote.client.jaxb;
 
 import org.kie.remote.jaxb.gen.*;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,10 +26,10 @@ import org.kie.remote.jaxb.gen.AbortWorkItemCommand;
 @SuppressWarnings("rawtypes")
 public class AcceptedClientCommands {
 
-    private AcceptedClientCommands() { 
+    private AcceptedClientCommands() {
         // static fields only
     }
-    
+
     private static Set<Class<?>> acceptedCommands = new HashSet<Class<?>>();
     static {
         acceptedCommands.add(AbortWorkItemCommand.class);
@@ -53,8 +69,18 @@ public class AcceptedClientCommands {
         acceptedCommands.add(ForwardTaskCommand.class);
         acceptedCommands.add(GetAttachmentCommand.class);
 
-        acceptedCommands.add(GetContentCommand.class);
+        acceptedCommands.add(GetContentByIdCommand.class);
         acceptedCommands.add(GetTaskContentCommand.class);
+
+        acceptedCommands.add(DeleteCommentCommand.class);
+        acceptedCommands.add(AddCommentCommand.class);
+        acceptedCommands.add(GetAllCommentsCommand.class);
+        acceptedCommands.add(GetCommentCommand.class);
+        acceptedCommands.add(SetTaskPropertyCommand.class);
+
+        acceptedCommands.add(AddContentFromUserCommand.class);
+        acceptedCommands.add(GetContentByIdForUserCommand.class);
+        acceptedCommands.add(GetContentMapForUserCommand.class);
 
         acceptedCommands.add(GetTaskAssignedAsBusinessAdminCommand.class);
         acceptedCommands.add(GetTaskAssignedAsPotentialOwnerCommand.class);
@@ -64,6 +90,7 @@ public class AcceptedClientCommands {
         acceptedCommands.add(GetTasksByStatusByProcessInstanceIdCommand.class);
         acceptedCommands.add(GetTasksByVariousFieldsCommand.class);
         acceptedCommands.add(GetTasksOwnedCommand.class);
+        acceptedCommands.add(TaskSummaryQueryCommand.class);
         acceptedCommands.add(NominateTaskCommand.class);
         acceptedCommands.add(ReleaseTaskCommand.class);
         acceptedCommands.add(ResumeTaskCommand.class);
@@ -85,38 +112,39 @@ public class AcceptedClientCommands {
         acceptedCommands.add(FindSubProcessInstancesCommand.class);
         acceptedCommands.add(FindVariableInstancesCommand.class);
         acceptedCommands.add(FindVariableInstancesByNameCommand.class);
-        
+
         acceptedCommands = Collections.unmodifiableSet(acceptedCommands);
     }
 
-    public static boolean isAcceptedCommandClass(Class<?> commandClass) { 
-        if( ! commandClass.getPackage().getName().equals(AbortWorkItemCommand.class.getPackage().getName()) ) { 
-           return false; 
+    public static boolean isAcceptedCommandClass(Class<?> commandClass) {
+        if( ! commandClass.getPackage().getName().equals(AbortWorkItemCommand.class.getPackage().getName()) ) {
+           return false;
         }
         return acceptedCommands.contains(commandClass);
     }
-    
+
     private static Set<Class<?>> taskCommandClassNamesThatInfluenceKieSession = new HashSet<Class<?>>();
-    static { 
+    static {
         taskCommandClassNamesThatInfluenceKieSession.add(CompleteTaskCommand.class);
         taskCommandClassNamesThatInfluenceKieSession.add(ExitTaskCommand.class);
         taskCommandClassNamesThatInfluenceKieSession.add(FailTaskCommand.class);
         taskCommandClassNamesThatInfluenceKieSession.add(SkipTaskCommand.class);
-        
+
         taskCommandClassNamesThatInfluenceKieSession = Collections.unmodifiableSet(taskCommandClassNamesThatInfluenceKieSession);
     }
-    
-    public static boolean isTaskCommandClassThatInfluencesKieSession(Class<?> commandClass) { 
+
+    public static boolean isTaskCommandClassThatInfluencesKieSession(Class<?> commandClass) {
         return taskCommandClassNamesThatInfluenceKieSession.contains(commandClass);
     }
-    
+
     private static Set<Class<?>> sendObjectParameterCommandClasses = new HashSet<Class<?>>();
-    static { 
+    static {
         sendObjectParameterCommandClasses.add(CompleteWorkItemCommand.class);
         sendObjectParameterCommandClasses.add(SignalEventCommand.class);
         sendObjectParameterCommandClasses.add(StartCorrelatedProcessCommand.class);
         sendObjectParameterCommandClasses.add(StartProcessCommand.class);
-        
+        sendObjectParameterCommandClasses.add(SetProcessInstanceVariablesCommand.class);
+
         sendObjectParameterCommandClasses.add(SetGlobalCommand.class);
         sendObjectParameterCommandClasses.add(InsertObjectCommand.class);
         sendObjectParameterCommandClasses.add(UpdateCommand.class);
@@ -124,23 +152,29 @@ public class AcceptedClientCommands {
         sendObjectParameterCommandClasses.add(AddTaskCommand.class);
         sendObjectParameterCommandClasses.add(CompleteTaskCommand.class);
         sendObjectParameterCommandClasses.add(FailTaskCommand.class);
-        
+
+        sendObjectParameterCommandClasses.add(ExecuteTaskRulesCommand.class);
+        sendObjectParameterCommandClasses.add(ProcessSubTaskCommand.class);
+        sendObjectParameterCommandClasses.add(SetTaskPropertyCommand.class);
+        sendObjectParameterCommandClasses.add(AddContentFromUserCommand.class);
+        sendObjectParameterCommandClasses.add(AddContentCommand.class);
+
         sendObjectParameterCommandClasses = Collections.unmodifiableSet(sendObjectParameterCommandClasses);
     }
 
-    public static boolean isSendObjectParameterCommandClass(Class<?> commandClass) { 
+    public static boolean isSendObjectParameterCommandClass(Class<?> commandClass) {
         return sendObjectParameterCommandClasses.contains(commandClass);
     }
-   
+
     private static Set<Class<?>> receiveObjectParameterCommandClasses = new HashSet<Class<?>>();
-    static { 
+    static {
         receiveObjectParameterCommandClasses.add(GetVariableCommand.class);
         receiveObjectParameterCommandClasses.add(GetGlobalCommand.class);
-        
+
         receiveObjectParameterCommandClasses = Collections.unmodifiableSet(sendObjectParameterCommandClasses);
     }
-    
-    public static boolean isReceiveObjectParameterCommandClass(Class<?> commandClass) { 
+
+    public static boolean isReceiveObjectParameterCommandClass(Class<?> commandClass) {
         return receiveObjectParameterCommandClasses.contains(commandClass);
     }
 }

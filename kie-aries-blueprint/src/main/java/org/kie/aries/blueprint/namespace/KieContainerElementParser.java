@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 JBoss Inc
+ * Copyright 2013 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@ public class KieContainerElementParser extends AbstractElementParser {
         beanMetadata.setClassName("org.kie.aries.blueprint.factorybeans.KieObjectsFactoryBean");
         beanMetadata.setFactoryMethod("fetchKContainer");
         beanMetadata.setId(id);
+
+        addBundleContextProperty(beanMetadata, context);
 
         if (!StringUtils.isEmpty(releaseIdRef)) {
             beanMetadata.addArgument(createRef(context, releaseIdRef), null, 0);

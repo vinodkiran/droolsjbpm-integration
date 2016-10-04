@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 JBoss Inc
+ * Copyright 2013 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,7 @@ import org.kie.spring.beans.SampleBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class KieSpringBasics2Test {
 
@@ -69,6 +68,28 @@ public class KieSpringBasics2Test {
         Person person = new Person("HAL", 42);
         person.setHappy(false);
         ksession.execute(person);
+        assertTrue(person.isHappy());
+
+        StatelessKieSession ksession2 = (StatelessKieSession) context.getBean("ksession1");
+        assertSame( ksession, ksession2 );
+    }
+
+    @Test
+    public void testPrototypeKSessionExecution() throws Exception {
+        StatelessKieSession ksession = (StatelessKieSession) context.getBean("ksession1p");
+        assertNotNull(ksession);
+        Person person = new Person("HAL", 42);
+        person.setHappy(false);
+        ksession.execute(person);
+        assertTrue(person.isHappy());
+
+        StatelessKieSession ksession2 = (StatelessKieSession) context.getBean("ksession1p");
+        assertNotSame( ksession, ksession2 );
+
+        assertNotNull(ksession2);
+        person = new Person("HAL", 42);
+        person.setHappy(false);
+        ksession2.execute(person);
         assertTrue(person.isHappy());
     }
 

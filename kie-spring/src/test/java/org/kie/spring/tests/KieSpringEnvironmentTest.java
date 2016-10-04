@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 JBoss Inc
+ * Copyright 2013 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,6 @@ public class KieSpringEnvironmentTest {
         assertNotNull(environment.get(EnvironmentName.TRANSACTION_MANAGER));
         assertNotNull(environment.get(EnvironmentName.ENTITY_MANAGER_FACTORY));
         assertNotNull(environment.get(EnvironmentName.GLOBALS));
-        assertNotNull(environment.get(EnvironmentName.DATE_FORMATS));
         assertNotNull(environment.get(EnvironmentName.CALENDARS));
 
         assertNotNull(environment.get(EnvironmentName.OBJECT_MARSHALLING_STRATEGIES));
@@ -88,7 +87,6 @@ public class KieSpringEnvironmentTest {
         assertNotNull(environment.get(EnvironmentName.TRANSACTION_MANAGER));
         assertNotNull(environment.get(EnvironmentName.ENTITY_MANAGER_FACTORY));
         assertNotNull(environment.get(EnvironmentName.GLOBALS));
-        assertNotNull(environment.get(EnvironmentName.DATE_FORMATS));
         assertNotNull(environment.get(EnvironmentName.CALENDARS));
 
         assertNotNull(environment.get(EnvironmentName.OBJECT_MARSHALLING_STRATEGIES));

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>6.3.0-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.kie</groupId>
@@ -16,6 +16,10 @@
   <name>Kie :: Aries Blueprint</name>
   <description>Drools and jBPM integration for Aries Blueprint</description>
   <packaging>bundle</packaging>
+
+  <properties>
+    <osgi.Bundle-SymbolicName>org.kie.aries.blueprint</osgi.Bundle-SymbolicName>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -111,6 +115,12 @@
       <artifactId>named-kiesession</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
     <!-- test persistence -->
     <!--<dependency>
       <groupId>org.hibernate</groupId>
@@ -133,6 +143,18 @@
       <scope>test</scope>
     </dependency>-->
 
+    <!-- needed for annotations/releaseId tests-->
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-ci</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -154,7 +176,6 @@
         <configuration>
           <instructions>
             <_removeheaders>Ignore-Package</_removeheaders>
-            <Bundle-SymbolicName>org.kie.aries.blueprint</Bundle-SymbolicName>
             <Bundle-Name>Kie Aries Blueprint</Bundle-Name>
             <Import-Package>
               !org.kie.aries.blueprint*,

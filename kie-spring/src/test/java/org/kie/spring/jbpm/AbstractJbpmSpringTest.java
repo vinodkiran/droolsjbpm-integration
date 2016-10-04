@@ -1,5 +1,21 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.kie.spring.jbpm;
 
+import org.kie.spring.jbpm.tools.IntegrationSpringBase;
 import java.io.File;
 import java.io.FilenameFilter;
 
@@ -11,7 +27,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import bitronix.tm.resource.jdbc.PoolingDataSource;
 
-public abstract class AbstractJbpmSpringTest {
+public abstract class AbstractJbpmSpringTest extends IntegrationSpringBase {
 
     protected static PoolingDataSource pds;
     protected ClassPathXmlApplicationContext context;
@@ -19,21 +35,20 @@ public abstract class AbstractJbpmSpringTest {
     @BeforeClass
     public static void generalSetup() {
         pds = setupPoolingDataSource();
+        System.setProperty(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
     }
 
     @Before
     public void setup() {
         cleanupSingletonSessionId();
-        System.setProperty("java.naming.factory.initial", "bitronix.tm.jndi.BitronixInitialContextFactory");
     }
-    
+
     @After
     public void cleanup() {
         if (context != null) {
             context.close();
             context = null;
         }
-        System.clearProperty("java.naming.factory.initial");
     }
 
     @AfterClass
@@ -41,6 +56,7 @@ public abstract class AbstractJbpmSpringTest {
         if (pds != null) {
             pds.close();
         }
+        System.clearProperty(javax.naming.Context.INITIAL_CONTEXT_FACTORY);
     }
 
     protected static PoolingDataSource setupPoolingDataSource() {

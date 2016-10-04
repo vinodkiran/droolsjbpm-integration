@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 JBoss Inc
+ * Copyright 2013 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.kie.aries.blueprint.namespace;
 
 import org.apache.aries.blueprint.ParserContext;
+import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.aries.blueprint.mutable.MutableComponentMetadata;
 import org.apache.aries.blueprint.mutable.MutableRefMetadata;
 import org.apache.aries.blueprint.mutable.MutableValueMetadata;
@@ -93,7 +94,15 @@ public abstract class AbstractElementParser {
         return createValue(context, value, "java.lang.Integer");
     }
 
-    public static ValueMetadata createValue(ParserContext context, int value, String type) {
+    public static ValueMetadata createValue(ParserContext context, long value) {
+        return createValue(context, value, "java.lang.Long");
+    }
+
+    public static ValueMetadata createValue(ParserContext context, boolean value) {
+        return createValue(context, value, "java.lang.Boolean");
+    }
+
+    public static ValueMetadata createValue(ParserContext context, Object value, String type) {
         MutableValueMetadata m = context.createMetadata(MutableValueMetadata.class);
         m.setStringValue(""+value);
         m.setType(type);
@@ -107,4 +116,16 @@ public abstract class AbstractElementParser {
     }
 
     public abstract Metadata parseElement(ParserContext context, Element element);
+
+    /**
+     * Adds 'bundleContext' property into the specific bean metadata. Bundle context can then be used to get
+     * a bundle classloader which is needed in order to correctly use resources from other bundles (e.g. domain classes
+     * in different bundle from the ones with DRL rules)
+     *
+     * @param beanMetadata mutable bean metadata holding
+     * @param context blueprint parser context
+     */
+    protected void addBundleContextProperty(MutableBeanMetadata beanMetadata, ParserContext context) {
+        beanMetadata.addProperty("bundleContext", createRef(context, "blueprintBundleContext"));
+    }
 }

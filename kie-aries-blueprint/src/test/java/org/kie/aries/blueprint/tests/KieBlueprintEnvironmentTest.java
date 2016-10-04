@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 JBoss Inc
+ * Copyright 2013 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import org.drools.core.base.CalendarsImpl;
 import org.drools.core.base.MapGlobalResolver;
 import org.drools.core.marshalling.impl.IdentityPlaceholderResolverStrategy;
 import org.drools.core.marshalling.impl.SerializablePlaceholderResolverStrategy;
-import org.drools.core.type.DateFormatsImpl;
 import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
 import org.jbpm.marshalling.impl.ProcessInstanceResolverStrategy;
 import org.junit.AfterClass;
@@ -41,7 +40,6 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-@Ignore("Add when org.apache.aries.blueprint.noosgi 1.0.1 is released")
 public class KieBlueprintEnvironmentTest {
 
     static BlueprintContainerImpl container = null;
@@ -92,21 +90,30 @@ public class KieBlueprintEnvironmentTest {
     }
 
     @Test
-    public void testEnvRefDateFormats() throws Exception {
-        Environment environment = (Environment) container.getComponentInstance("drools-env");
-        assertNotNull(environment);
-
-        assertNotNull(environment.get(EnvironmentName.DATE_FORMATS));
-        assertTrue(environment.get(EnvironmentName.DATE_FORMATS) instanceof DateFormatsImpl);
-    }
-
-    @Test
     public void testEnvRefCalendars() throws Exception {
         Environment environment = (Environment) container.getComponentInstance("drools-env");
         assertNotNull(environment);
 
         assertNotNull(environment.get(EnvironmentName.CALENDARS));
         assertTrue(environment.get(EnvironmentName.CALENDARS) instanceof CalendarsImpl);
+    }
+
+    @Test
+    public void testEnvRefUserTransaction() throws Exception {
+        Environment environment = (Environment) container.getComponentInstance("drools-env");
+        assertNotNull(environment);
+
+        assertNotNull(environment.get(EnvironmentName.TRANSACTION));
+        assertTrue(environment.get(EnvironmentName.TRANSACTION) instanceof MockJpaTransactionManager);
+    }
+
+    @Test
+    public void testEnvRefTransactionSyncRegistry() throws Exception {
+        Environment environment = (Environment) container.getComponentInstance("drools-env");
+        assertNotNull(environment);
+
+        assertNotNull(environment.get(EnvironmentName.TRANSACTION_SYNCHRONIZATION_REGISTRY));
+        assertTrue(environment.get(EnvironmentName.TRANSACTION) instanceof MockJpaTransactionManager);
     }
 
     @Test
